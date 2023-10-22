@@ -1,0 +1,11 @@
+{
+    "name": "loiras",
+    "version": "1.0.0",
+    "description": "Amo loiras",
+    "manifest_version":3,
+    "author": "O paizão",
+    "action":{
+        "default_popup": "index.html",
+        "default_title": "Teste"
+    }
+}
