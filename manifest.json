@@ -5,9 +5,7 @@
     "manifest_version":3,
     "permissions": ["storage", "tabs", "activeTab"],
     "author": "Arthur Konrad, Jesus Betancourt, Goncalo Abreu, Leandro Fiteira ",
-    "background": {
-        "service_worker": "background.js"
-      },
+
     "action":{
         "default_popup": "index.html",
         "default_title": "Teste"

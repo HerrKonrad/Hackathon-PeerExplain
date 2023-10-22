@@ -1,39 +1,41 @@
-console.log('teste')
+console.log('teste');
+const peerConnection = new RTCPeerConnection();
 
-/*
-const importedScripts = [];
-
-function tryImport(...fileNames) {
-  try {
-    const toRun = new Set(fileNames.filter(f => !importedScripts.includes(f)));
-    if (toRun.size) {
-      importedScripts.push(...toRun);
-      importScripts(...toRun);
-    }
-    return true;
-  } catch (e) {
-    console.error(e);
+// Adicione um manipulador de eventos para quando um candidato de ICE estiver pronto
+peerConnection.onicecandidate = function(event) {
+  if (event.candidate) {
+    // Envie o candidato para o outro par (implementação específica necessária)
+    sendIceCandidateToOtherPeer(event.candidate);
   }
-}
-
-self.oninstall = () => {
-  // The imported script shouldn't do anything, but only declare a global function
-  // (someComplexScriptAsyncHandler) or use an analog of require() to register a module
-  tryImport('./peerjs.js');
 };
 
-chrome.runtime.onMessage.addListener((msg, sender, sendResponse) => {
-  if (msg.action === 'somethingComplex') {
-    if (tryImport('./peerjs.js')) {
-      // calling a global function from some-complex-script.js
-      someComplexScriptAsyncHandler(msg, sender, sendResponse);
-   
-      return true;
-    }
+// Adicione um manipulador de eventos para quando a descrição local estiver definida
+peerConnection.onnegotiationneeded = async function() {
+  try {
+    // Crie uma oferta para iniciar a negociação
+    const offer = await peerConnection.createOffer();
+    
+    // Defina a descrição local
+    await peerConnection.setLocalDescription(offer);
+    
+    // Envie a oferta para o outro par (implementação específica necessária)
+    sendOfferToOtherPeer(offer);
+  } catch (error) {
+    console.error("Erro ao criar oferta:", error);
   }
-});
-*/
+};
 
+// Função para enviar a oferta para o outro par (substitua por sua implementação)
+function sendOfferToOtherPeer(offer) {
+  // Implemente a lógica para enviar a oferta para o outro par (usando um servidor de sinalização, por exemplo)
+  console.log('Oferta enviada para o outro par:', offer);
+}
+
+// Função para enviar o candidato ICE para o outro par (substitua por sua implementação)
+function sendIceCandidateToOtherPeer(candidate) {
+  // Implemente a lógica para enviar o candidato ICE para o outro par (usando um servidor de sinalização, por exemplo)
+  console.log('Candidato ICE enviado para o outro par:', candidate);
+}
 
 
 
