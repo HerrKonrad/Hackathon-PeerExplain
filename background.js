@@ -1,6 +1,12 @@
 console.log('teste');
-const peerConnection = new RTCPeerConnection();
-
+var peer = new Peer();
+var conn = peer.connect(peer.id);
+// on open will be launch when you successfully connect to PeerServer
+conn.on('open', function(){
+  // here you have conn.id
+  conn.send('hi!');
+});
+/*
 // Adicione um manipulador de eventos para quando um candidato de ICE estiver pronto
 peerConnection.onicecandidate = function(event) {
   if (event.candidate) {
@@ -37,5 +43,4 @@ function sendIceCandidateToOtherPeer(candidate) {
   console.log('Candidato ICE enviado para o outro par:', candidate);
 }
 
-
-
+*/
