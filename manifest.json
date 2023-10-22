@@ -1,9 +1,13 @@
 {
-    "name": "loiras",
+    "name": "PeerExplain",
     "version": "1.0.0",
-    "description": "Amo loiras",
+    "description": "...",
     "manifest_version":3,
-    "author": "O paizão",
+    "permissions": ["storage", "tabs", "activeTab"],
+    "author": "Arthur Konrad, Jesus Betancourt, Goncalo Abreu, Leandro Fiteira ",
+    "background": {
+        "service_worker": "background.js"
+      },
     "action":{
         "default_popup": "index.html",
         "default_title": "Teste"
