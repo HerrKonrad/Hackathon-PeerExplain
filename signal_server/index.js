@@ -2,12 +2,12 @@ const http = require('http');
 const server = http.createServer();
 const socketServer  = require('socket.io')(server, {
     cors: {
-      origin: "*", // ou "*" para aceitar de qualquer origem
-      methods: ["GET", "POST"] // os métodos HTTP permitidos
+      origin: "http://localhost:3000", // ou "*" para aceitar de qualquer origem
+      methods: ["GET", "POST"], // os métodos HTTP permitidos
+      credentials: true // se true, permite enviar cookies com o pedido
     }
   });
 const cors = require('cors');
-
 
 const clients = {};
 
