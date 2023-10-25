@@ -4,24 +4,26 @@ import * as Icon from "react-bootstrap-icons";
 
 const ModalLogin = ({ show, onHide, click }) => {
   const nome = useRef("");
-  const idade = useRef("");
+  const dataNasc = useRef("");
   const area = useRef("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const nomeValue = nome.current.value;
-    const idadeValue = idade.current.value;
+    const dataNascValue = dataNasc.current.value;
     const areaValue = area.current.value;
 
     const user = {
       nome: nomeValue,
-      idade: idadeValue,
+      data: dataNascValue,
       area: areaValue,
     };
 
     const userJSON = JSON.stringify(user);
 
     localStorage.setItem("Utilizador", userJSON);
+
+    onHide();
   };
 
   return (
@@ -44,12 +46,12 @@ const ModalLogin = ({ show, onHide, click }) => {
                 ref={nome}
                 required
               />
-              <Form.Label>Idade</Form.Label>
+              <Form.Label>Data de nascimento</Form.Label>
               <Form.Control
-                type="number"
-                name="idade"
+                type="date"
+                name="dataNasc"
                 className="mb-3"
-                ref={idade}
+                ref={dataNasc}
                 required
               />
               <Form.Label>Área de Estudo</Form.Label>

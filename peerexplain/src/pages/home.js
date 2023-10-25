@@ -6,12 +6,12 @@ import Navbar from "react-bootstrap/Navbar";
 import ModalLogin from "../components/modalLogin";
 import ModalPergunta from "../components/modalPergunta";
 import { Peer } from 'peerjs';
+import axios from "axios";
 import "./style.css";
 
 function Home() {
   const [activeTab, setActiveTab] = useState(1);
 
-  const [firstLogin, setFirstLogin] = useState(1);
 
   const [showModalPergunta, setShowModalPergunta] = useState(false);
 
@@ -22,7 +22,6 @@ function Home() {
 
   const handleCloseModalLogin = () => {
     setShowModalLogin(false);
-    setFirstLogin(0);
   };
 
   var cardData = {
@@ -47,7 +46,7 @@ function Home() {
   useEffect(() => {
     console.log('P2P component mounted');
     const newPeer = new Peer({
-      host: 'localhost',
+      host: '192.168.240.223',
       port: 9000,
       path: '/myapp',
     });
@@ -146,6 +145,34 @@ function Home() {
     });
   }
 
+
+
+  const api = axios.create({
+    baseURL: "https://api.openai.com/v1",
+  });
+  api.defaults.headers.common["Authorization"] = `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`;
+  
+  const data = {
+    model: "gpt-3.5-turbo",
+    messages: [
+      {
+        role: "user",
+        content: "Nome de 3 gatos",
+      },
+    ],
+  };
+
+  const postData = async () => {
+    try {
+      const response = await api.post("/chat/completions", data);
+      console.log("Response data:", response.data.choices[0].message.content);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+  
+  postData();
+  
   return (
     <>
       <Navbar expand="lg" className="bg-primary">
@@ -230,7 +257,7 @@ function Home() {
             ) : null}
           </div>
 
-          {firstLogin === 1 ? (
+          {!localStorage.getItem("Utilizador") ? (
             <ModalLogin
               show={showModalLogin}
               onHide={handleCloseModalLogin}
