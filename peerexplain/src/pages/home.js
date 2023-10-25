@@ -58,9 +58,11 @@ const checkBestAnswer = (question, answers, userProfile) => {
   // ...
 }
 /*
-const question = "¿Cuál es la capital de Francia?";
-const answerChoices = ["Paris", "Berlin", "London", "Madrid"];
-const user = { name: "John", age: 30 };
+const question = "¿Cómo funciona una transmisión manual?";
+const answerChoices = ["Una transmisión manual es un componente del vehículo que permite al conductor seleccionar manualmente las marchas del motor. Consiste en un conjunto de engranajes que conectan el motor a las ruedas. El conductor utiliza un pedal de embrague para desconectar temporalmente el motor de la transmisión, permitiendo así cambiar de marcha. Las marchas más bajas proporcionan más potencia para arrancar y subir colinas, mientras que las marchas más altas permiten una mayor velocidad en terrenos planos.", "Una transmisión manual, también conocida como caja de cambios manual, opera mediante el uso de engranajes y un embrague. El motor está conectado a un conjunto de piñones, y el conductor puede seleccionar manualmente diferentes combinaciones de piñones para variar la relación de transmisión entre el motor y las ruedas. La relación de transmisión influye en el torque y la velocidad del vehículo.
+
+El embrague es crucial en este proceso. Cuando el conductor presiona el pedal del embrague, se desconecta temporalmente el motor de la transmisión, permitiendo cambiar de marcha sin detener el vehículo. Al liberar gradualmente el pedal del embrague, se vuelve a conectar el motor y la transmisión de manera suave."];
+const user = { name: "John", age: 30, levelOfEducation: "master degree", field : "History"  };
 
 checkBestAnswer(question, answerChoices, user);
 */
@@ -191,9 +193,44 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
       
       if(broadcastType === "QUESTION")
        {
+        const question = conteudo.question;
         // Se for para verificar se temos uma pergunta
       // Comparar o título de cada uma e verificar com "compararFrases()" se são semelhantes
+      // Define a function to compare a question with a list of answers
+      function compareQuestionWithAnswers(question, answers) {
+        // Create an empty array to store the matching answers
+        const matchingAnswers = [];
+
+        // Loop through each answer in the list
+        answers.forEach((answer) => {
+          // Compare the question with the answer's title using the compararFrases function
+          const similarity = compararFrases(question, answer.title);
+
+          // If the similarity is above a certain threshold, add the answer to the matchingAnswers array
+          if (similarity.saoSemelhantes) {
+            matchingAnswers.push(answer);
+          }
+        });
+
+        // Return the array of matching answers
+        return matchingAnswers;
+      }
+
+      // Example usage:
+      const answers = [
+        { title: "Paris" },
+        { title: "London" },
+        { title: "Berlin" },
+        { title: "Madrid" },
+      ];
+
+      const matchingAnswers = compareQuestionWithAnswers(question, answers);
+      console.log(matchingAnswers); // Output: [{ title: "Paris" }]
+
       // Se forem semelhantes enviamos a resposta para quem fez o broadcast
+      
+
+
 
       // Se não forem semelhantes não fazemos nada
        }
