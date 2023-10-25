@@ -193,18 +193,23 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
       
       if(broadcastType === "QUESTION")
        {
+        console.log("Recebi uma pergunta");
         const question = conteudo.question;
         // Se for para verificar se temos uma pergunta
       // Comparar o título de cada uma e verificar com "compararFrases()" se são semelhantes
       // Define a function to compare a question with a list of answers
-      function compareQuestionWithAnswers(question, answers) {
+
         // Create an empty array to store the matching answers
-        const matchingAnswers = [];
+       const matchingAnswers = [];
+        const answers = minhasPerguntas;
+
+        
 
         // Loop through each answer in the list
         answers.forEach((answer) => {
           // Compare the question with the answer's title using the compararFrases function
-          const similarity = compararFrases(question, answer.title);
+          const similarity = compararFrases(question, answer.titulo);
+          console.log("Titulo", answer.titulo)
 
           // If the similarity is above a certain threshold, add the answer to the matchingAnswers array
           if (similarity.saoSemelhantes) {
@@ -212,24 +217,22 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
           }
         });
 
-        // Return the array of matching answers
-        return matchingAnswers;
-      }
-
-      // Example usage:
-      const answers = [
-        { title: "Paris" },
-        { title: "London" },
-        { title: "Berlin" },
-        { title: "Madrid" },
-      ];
-
-      const matchingAnswers = compareQuestionWithAnswers(question, answers);
-      console.log(matchingAnswers); // Output: [{ title: "Paris" }]
+    
+      console.log("Respostas semelhantes", matchingAnswers); 
 
       // Se forem semelhantes enviamos a resposta para quem fez o broadcast
-      
-
+      /*
+      const resposta = {
+        "respostas" : {
+        "1" : { "conteudo" : "xpto", "autor" : "o pai"},
+        "2" : {"conteudo" : "xptooooo", "autor" : "o pai"}
+      }
+    }
+   matchingAnswers.push(resposta)
+   */
+        
+      if(matchingAnswers.length > 0)
+      sendDirectMessage(id_remetente, matchingAnswers);
 
 
       // Se não forem semelhantes não fazemos nada
