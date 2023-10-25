@@ -46,20 +46,20 @@ function Home() {
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
               <Nav.Link className="text-light">
-                <a
+                <span
                   className={`nav-link ${activeTab === 1 ? "active" : ""}`}
                   onClick={() => setActiveTab(1)}
                 >
                   Mis preguntas
-                </a>
+                </span>
               </Nav.Link>
               <Nav.Link className="text-light">
-                <a
+                <span
                   className={`nav-link ${activeTab === 2 ? "active" : ""}`}
                   onClick={() => setActiveTab(2)}
                 >
                   Mis respuestas
-                </a>
+                </span>
               </Nav.Link>
             </Nav>
           </Navbar.Collapse>
@@ -77,9 +77,9 @@ function Home() {
                     <h5 className="card-title">{cardData.cardTitle}</h5>
                     <p className="card-text">{cardData.cardText}</p>
                     <div className=" d-md-flex justify-content-md-end">
-                      <a href="#" className="btn btn-primary">
+                      <span href="#" className="btn btn-primary">
                         Mais detalhes
-                      </a>
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -105,9 +105,7 @@ function Home() {
                         With supporting text below as a natural lead-in to
                         additional content.
                       </p>
-                      <a href="#" className="btn btn-primary">
-                        Go somewhere
-                      </a>
+                      <span className="btn btn-primary">Go somewhere</span>
                     </div>
                   </div>
                 </div>
