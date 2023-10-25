@@ -16,7 +16,11 @@ function Home() {
   const [showModalPergunta, setShowModalPergunta] = useState(false);
 
   const handleCloseModalPergunta = () => setShowModalPergunta(false);
-  const handleShowModalPergunta = () => setShowModalPergunta(true);
+  const handleShowModalPergunta = () => 
+  {
+    setShowModalPergunta(true);
+    
+  }
 
   const [showModalLogin, setShowModalLogin] = useState(true);
 
@@ -64,6 +68,8 @@ function Home() {
       newPeer.on('connection', (conn) => {
         conn.on('data', (data) => {
           console.log('Recebi uma mensagem:', data);
+          handleReceiveMessage(data)
+          
         });
       });
 
@@ -78,14 +84,14 @@ function Home() {
     };
   }, []);
 
-  const handleSendMessage = () => {
-    const conn = peerRef.current.connect(targetId);
+  const sendDirectMessage = (id_destinatario, mensagem) => {
+    const conn = peerRef.current.connect(id_destinatario);
 
     const messageToSend = {
       id_remetente: myID,
-      id_destinatario: targetId,
+      id_destinatario: id_destinatario,
       type: "DIRECT", 
-      message: message
+      message: mensagem
     };
   
     if (conn) {
@@ -102,19 +108,74 @@ function Home() {
     }
   };
 
-  const sendQuestionl = () => {
+  const handleReceiveMessage = (message) => {
 
-    /*
-    console.log("Enviando a pergunta para todoas");
-    const toSendMsg = {
-      personName : "XPTO",
-      question : "Como fazer uma pergunta?"
+    const id_remetente = message.id_remetente;
+    const type = message.type;
+    const conteudo = message.message
+    if(type === "DIRECT")
+    {
+
+    }else if(type === "BROADCAST")
+    {
+      const broadcastType = conteudo.type;
+      const personName = conteudo.personName;
+
+      // Remover
+      //sendDirectMessage(id_remetente, "Olá " + personName + " recebi a sua mensagem");
+      console.log("Resposta enviada?")
+      
+      // Se for para verificar se temos uma pergunta
+      if(broadcastType === "QUESTION")
+       {
+        // Verificamos se temos em localStorage um pergunta parecida
+
+        // Caso tenhamos enviamos de volta para quem nos fez broadcast
+       }
+       else if(broadcastType === "GETQUESTIONS")
+       {
+        // Um pedido para enviarmos todas perguntas que temos, enviamos tudo.
+
+       }
     }
-*/
+  
 
   }
 
+  const sendQuestion = (questionText) => {
+
+    const usuarioString = localStorage.getItem("Utilizador");
+    // Converte a string JSON para objeto JavaScript
+    let personName;
+    if (usuarioString) {
+      const usuarioObjeto = JSON.parse(usuarioString);
+
+      // Obtém o valor do elemento 'nome' do objeto
+     personName = usuarioObjeto.nome;
+    }
+    
+    console.log("Enviando a pergunta para todoas");
+    if(personName)
+    {
+      const question = {
+        type: "QUESTION",
+        personName : personName,
+        question :  questionText
+      
+    }
+    sendBroadCast(question);
+    // Se sucedido armazena a pergunta em local storage
+
+    }
+  }
+  
+
   const sendBroadCast = (msg) => { 
+    // Atualizar peers
+    peerRef.current.listAllPeers((peers) => {
+      console.log('Atualização dos Peers conectados: ' + peers);
+      setAllPeers(peers); // Atualiza o estado
+    });
     allPeers.forEach((peer) => {
 
       if (peer != myID) {
@@ -200,6 +261,7 @@ function Home() {
                     show={showModalPergunta}
                     onHide={handleCloseModalPergunta}
                     click={handleCloseModalPergunta}
+                    sendQuestion={sendQuestion}
                   />
                 </div>
               </>
