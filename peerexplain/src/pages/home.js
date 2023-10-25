@@ -4,8 +4,8 @@ import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import ModalLogin from "../components/modalLogin";
-import ModalPergunta from "../components/modalPergunta";
 import { Accordion } from "react-bootstrap";
+import ModalPergunta from "../components/modalPergunta";
 import { Peer } from 'peerjs';
 import axios from "axios";
 import "./style.css";
@@ -20,6 +20,7 @@ api.defaults.headers.common["Authorization"] = `Bearer ${process.env.REACT_APP_O
 function Home() {
   const [activeTab, setActiveTab] = useState(1);
 
+  const [isAccordionOpen, setIsAccordionOpen] = useState(true);
 
 
   const [showModalPergunta, setShowModalPergunta] = useState(false);
@@ -360,14 +361,25 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
           <div className="col-md-12">
             {activeTab === 1 ? (
               <>
-                <div className="accordion" id="usersAccordion">
+<div className="accordion" id="usersAccordion">
   <div className="accordion-item">
     <h2 className="accordion-header" id="usersHeading">
-      <button className="accordion-button" type="button" aria-expanded="true" aria-controls="collapseOne">
+      <button
+        className={`accordion-button ${!isAccordionOpen ? 'bg-white' : ''}`} // Adicione a classe condicional aqui
+        type="button"
+        aria-expanded={isAccordionOpen}
+        onClick={() => setIsAccordionOpen(!isAccordionOpen)}
+        aria-controls="collapseOne"
+      >
         Mis Preguntas:
       </button>
     </h2>
-    <div id="usersCollapse" className="accordion-collapse collapse show" aria-labelledby="usersHeading" data-bs-parent="#usersAccordion">
+    <div
+      id="usersCollapse"
+      className={`accordion-collapse collapse ${isAccordionOpen ? 'show' : ''}`}
+      aria-labelledby="usersHeading"
+      data-bs-parent="#usersAccordion"
+    >
       <div className="accordion-body" style={{ maxHeight: "1000px", overflowY: "auto" }}>
         <ul className="list-group">
           {cardDataArray.map((card, index) => (
@@ -389,6 +401,8 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
     </div>
   </div>
 </div>
+
+
 
                 <div class="fab">
                   <button class="main" onClick={handleShowModalPergunta}>
