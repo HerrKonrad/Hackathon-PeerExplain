@@ -1,10 +1,11 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import * as Icon from "react-bootstrap-icons";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import ModalLogin from "../components/modalLogin";
 import ModalPergunta from "../components/modalPergunta";
+import { Peer } from 'peerjs';
 import "./style.css";
 
 function Home() {
@@ -36,6 +37,114 @@ function Home() {
 
   // Armazene a string no localStorage
   localStorage.setItem("cardData", cardDataString);
+
+  const [targetId, setTargetId] = useState('');
+  const [myID, setMyId] = useState('');
+  const [message, setMessage] = useState('');
+  const [allPeers, setAllPeers] = useState([]);
+  const peerRef = useRef(null);
+
+  useEffect(() => {
+    console.log('P2P component mounted');
+    const newPeer = new Peer({
+      host: 'localhost',
+      port: 9000,
+      path: '/myapp',
+    });
+
+    newPeer.on('open', () => {
+      console.log('My peer ID is: ' + newPeer.id);
+      setMyId(newPeer.id); // Atualiza o estado
+
+      newPeer.listAllPeers((peers) => {
+        console.log('Peers conectados: ' + peers);
+        setAllPeers(peers); // Atualiza o estado
+      });
+
+      newPeer.on('connection', (conn) => {
+        conn.on('data', (data) => {
+          console.log('Recebi uma mensagem:', data);
+        });
+      });
+
+      peerRef.current = newPeer;
+    });
+
+    return () => {
+      // Encerrar a conexão ao desmontar o componente, se necessário
+      if (peerRef.current) {
+        peerRef.current.destroy();
+      }
+    };
+  }, []);
+
+  const handleSendMessage = () => {
+    const conn = peerRef.current.connect(targetId);
+
+    const messageToSend = {
+      id_remetente: myID,
+      id_destinatario: targetId,
+      type: "DIRECT", 
+      message: message
+    };
+  
+    if (conn) {
+      conn.on('open', () => {
+        console.log('Connection established');
+        conn.send(messageToSend);
+      });
+  
+      conn.on('error', (err) => {
+        console.log('Failed to connect: ' + err);
+      });
+    } else {
+      console.log('Connection not established. Check peer availability.');
+    }
+  };
+
+  const sendQuestionl = () => {
+
+    /*
+    console.log("Enviando a pergunta para todoas");
+    const toSendMsg = {
+      personName : "XPTO",
+      question : "Como fazer uma pergunta?"
+    }
+*/
+
+  }
+
+  const sendBroadCast = (msg) => { 
+    allPeers.forEach((peer) => {
+
+      if (peer != myID) {
+        console.log(peer)
+        const conn = peerRef.current.connect(peer);
+
+
+  
+        if (conn) {
+          conn.on('open', () => {
+            const messageToSend = {
+              id_remetente: myID,
+              id_destinatario: peer,
+              type: "BROADCAST", 
+              message: msg
+            };
+            
+            console.log('Connection established');
+            conn.send(messageToSend);
+          });
+    
+          conn.on('error', (err) => {
+            console.log('Failed to connect: ' + err);
+          });
+        } else {
+          console.log('Connection not established. Check peer availability.');
+        }
+      }
+    });
+  }
 
   return (
     <>
