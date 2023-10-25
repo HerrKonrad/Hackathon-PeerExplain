@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import * as Icon from "react-bootstrap-icons";
 import Container from "react-bootstrap/Container";
 import Nav from "react-bootstrap/Nav";
@@ -6,6 +6,7 @@ import Navbar from "react-bootstrap/Navbar";
 import ModalLogin from "../components/modalLogin";
 import ModalPergunta from "../components/modalPergunta";
 import { Accordion } from "react-bootstrap";
+import { Peer } from 'peerjs';
 import "./style.css";
 
 function Home() {
@@ -16,7 +17,11 @@ function Home() {
   const [showModalPergunta, setShowModalPergunta] = useState(false);
 
   const handleCloseModalPergunta = () => setShowModalPergunta(false);
-  const handleShowModalPergunta = () => setShowModalPergunta(true);
+  const handleShowModalPergunta = () => 
+  {
+    setShowModalPergunta(true);
+    
+  }
 
   const [showModalLogin, setShowModalLogin] = useState(true);
 
@@ -70,6 +75,172 @@ function Home() {
   if (respostas) {
     var respostasArray = Object.values(respostas);
   }
+
+  const [targetId, setTargetId] = useState('');
+  const [myID, setMyId] = useState('');
+  const [message, setMessage] = useState('');
+  const [allPeers, setAllPeers] = useState([]);
+  const peerRef = useRef(null);
+
+  useEffect(() => {
+    console.log('P2P component mounted');
+    const newPeer = new Peer({
+      host: 'localhost',
+      port: 9000,
+      path: '/myapp',
+    });
+
+    newPeer.on('open', () => {
+      console.log('My peer ID is: ' + newPeer.id);
+      setMyId(newPeer.id); // Atualiza o estado
+
+      newPeer.listAllPeers((peers) => {
+        console.log('Peers conectados: ' + peers);
+        setAllPeers(peers); // Atualiza o estado
+      });
+
+      newPeer.on('connection', (conn) => {
+        conn.on('data', (data) => {
+          console.log('Recebi uma mensagem:', data);
+          handleReceiveMessage(data)
+          
+        });
+      });
+
+      peerRef.current = newPeer;
+    });
+
+    return () => {
+      // Encerrar a conexão ao desmontar o componente, se necessário
+      if (peerRef.current) {
+        peerRef.current.destroy();
+      }
+    };
+  }, []);
+
+  const sendDirectMessage = (id_destinatario, mensagem) => {
+    const conn = peerRef.current.connect(id_destinatario);
+
+    const messageToSend = {
+      id_remetente: myID,
+      id_destinatario: id_destinatario,
+      type: "DIRECT", 
+      message: mensagem
+    };
+  
+    if (conn) {
+      conn.on('open', () => {
+        console.log('Connection established');
+        conn.send(messageToSend);
+      });
+  
+      conn.on('error', (err) => {
+        console.log('Failed to connect: ' + err);
+      });
+    } else {
+      console.log('Connection not established. Check peer availability.');
+    }
+  };
+
+  const handleReceiveMessage = (message) => {
+
+    const id_remetente = message.id_remetente;
+    const type = message.type;
+    const conteudo = message.message
+    if(type === "DIRECT")
+    {
+
+    }else if(type === "BROADCAST")
+    {
+      const broadcastType = conteudo.type;
+      const personName = conteudo.personName;
+
+      // Remover
+      //sendDirectMessage(id_remetente, "Olá " + personName + " recebi a sua mensagem");
+      console.log("Resposta enviada?")
+      
+      // Se for para verificar se temos uma pergunta
+      if(broadcastType === "QUESTION")
+       {
+        // Verificamos se temos em localStorage um pergunta parecida
+
+        // Caso tenhamos enviamos de volta para quem nos fez broadcast
+       }
+       else if(broadcastType === "GETQUESTIONS")
+       {
+        // Um pedido para enviarmos todas perguntas que temos, enviamos tudo.
+
+       }
+    }
+  
+
+  }
+
+  const sendQuestion = (questionText) => {
+
+    const usuarioString = localStorage.getItem("Utilizador");
+    // Converte a string JSON para objeto JavaScript
+    let personName;
+    if (usuarioString) {
+      const usuarioObjeto = JSON.parse(usuarioString);
+
+      // Obtém o valor do elemento 'nome' do objeto
+     personName = usuarioObjeto.nome;
+    }
+    
+    console.log("Enviando a pergunta para todoas");
+    if(personName)
+    {
+      const question = {
+        type: "QUESTION",
+        personName : personName,
+        question :  questionText
+      
+    }
+    sendBroadCast(question);
+    // Se sucedido armazena a pergunta em local storage
+
+    }
+  }
+  
+
+  const sendBroadCast = (msg) => { 
+    // Atualizar peers
+    peerRef.current.listAllPeers((peers) => {
+      console.log('Atualização dos Peers conectados: ' + peers);
+      setAllPeers(peers); // Atualiza o estado
+    });
+    allPeers.forEach((peer) => {
+
+      if (peer != myID) {
+        console.log(peer)
+        const conn = peerRef.current.connect(peer);
+
+
+  
+        if (conn) {
+          conn.on('open', () => {
+            const messageToSend = {
+              id_remetente: myID,
+              id_destinatario: peer,
+              type: "BROADCAST", 
+              message: msg
+            };
+            
+            console.log('Connection established');
+            conn.send(messageToSend);
+          });
+    
+          conn.on('error', (err) => {
+            console.log('Failed to connect: ' + err);
+          });
+        } else {
+          console.log('Connection not established. Check peer availability.');
+        }
+      }
+    });
+  }
+
   return (
     <>
       <Navbar expand="lg" className="bg-primary">
@@ -79,6 +250,7 @@ function Home() {
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
               <Nav.Link className="text-light">
+
                 <a className={`nav-link ${activeTab === 1 ? "active" : ""}`} onClick={() => setActiveTab(1)}>
                   Preguntas
                 </a>
@@ -87,6 +259,7 @@ function Home() {
                 <a className={`nav-link ${activeTab === 2 ? "active" : ""}`} onClick={() => setActiveTab(2)}>
                   Respuestas
                 </a>
+
               </Nav.Link>
             </Nav>
           </Navbar.Collapse>
@@ -132,7 +305,12 @@ function Home() {
                   <button class="main" onClick={handleShowModalPergunta}>
                     <Icon.PlusLg />
                   </button>
-                  <ModalPergunta show={showModalPergunta} onHide={handleCloseModalPergunta} click={handleCloseModalPergunta} />
+                  <ModalPergunta
+                    show={showModalPergunta}
+                    onHide={handleCloseModalPergunta}
+                    click={handleCloseModalPergunta}
+                    sendQuestion={sendQuestion}
+                  />
                 </div>
               </>
             ) : activeTab === 2 ? (
