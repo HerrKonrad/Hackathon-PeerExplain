@@ -318,49 +318,59 @@ localStorage.setItem("minhasPerguntas", novoJSONpergunta);
         <div className="row">
           <div className="col-md-12">
             {activeTab === 1 ? (
-              <>
-<div className="accordion" id="usersAccordion">
-  <div className="accordion-item">
-    <h2 className="accordion-header" id="usersHeading">
-      <button
-        className={`accordion-button ${!isAccordionOpen ? 'bg-white' : ''}`} // Adicione a classe condicional aqui
-        type="button"
-        aria-expanded={isAccordionOpen}
-        onClick={() => setIsAccordionOpen(!isAccordionOpen)}
-        aria-controls="collapseOne"
-      >
-        Mis Preguntas:
-      </button>
-    </h2>
-    <div
-      id="usersCollapse"
-      className={`accordion-collapse collapse ${isAccordionOpen ? 'show' : ''}`}
-      aria-labelledby="usersHeading"
-      data-bs-parent="#usersAccordion"
-    >
-      <div className="accordion-body" style={{ maxHeight: "1000px", overflowY: "auto" }}>
-        <ul className="list-group">
-          {cardDataArray.map((card, index) => (
-            <div className="card mt-3" key={index}>
-              <div className="card-header">{card.cardHeader}</div>
-              <div className="card-body">
-                <h5 className="card-title">{card.cardTitle}</h5>
-                <p className="card-text">{card.cardText}</p>
-                <div className="d-md-flex justify-content-md-end">
-                  <a href="#" className="btn btn-primary">
-                    Mas información
-                  </a>
-                </div>
-
-
-
-                <div class="fab">
-                  <button class="main" onClick={handleShowModalPergunta}>
-                    <Icon.PlusLg />
+            <>
+            <div className="accordion" id="usersAccordion">
+              <div className="accordion-item">
+                <h2 className="accordion-header" id="usersHeading">
+                  <button
+                    className={`accordion-button ${!isAccordionOpen ? 'bg-white' : ''}`} // Adicione a classe condicional aqui
+                    type="button"
+                    aria-expanded={isAccordionOpen}
+                    onClick={() => setIsAccordionOpen(!isAccordionOpen)}
+                    aria-controls="collapseOne"
+                  >
+                    Mis Preguntas:
                   </button>
-                  <ModalPergunta show={showModalPergunta} onHide={handleCloseModalPergunta} click={handleCloseModalPergunta} sendQuestion={sendQuestion} />
+                </h2>
+                <div
+                  id="usersCollapse"
+                  className={`accordion-collapse collapse ${isAccordionOpen ? 'show' : ''}`}
+                  aria-labelledby="usersHeading"
+                  data-bs-parent="#usersAccordion"
+                >
+                  <div className="accordion-body" style={{ maxHeight: "1000px", overflowY: "auto" }}>
+                    <ul className="list-group">
+                    { minhasPerguntasArray ? (
+                          minhasPerguntasArray.map((perguntas, index) => (
+                            <div className="card mt-3" key={index}>
+                              <div className="card-header">{perguntas.autor}</div>
+                              <div className="card-body">
+                                <h5 className="card-title">{perguntas.titulo}</h5>
+                                <p className="card-text">{perguntas.area}</p>
+                                <div className="d-md-flex justify-content-md-end">
+                                  <a href="#" className="btn btn-primary">
+                                    Más información
+                                  </a>
+                                </div>
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <p>No hay datos disponibles.</p>
+                        )}
+                    </ul>
+                  </div>
                 </div>
-              </>
+              </div>
+              <div class="fab">
+                <button class="main" onClick={handleShowModalPergunta}>
+                  <Icon.PlusLg />
+                </button>
+                <ModalPergunta show={showModalPergunta} onHide={handleCloseModalPergunta} click={handleCloseModalPergunta} sendQuestion={sendQuestion} />
+              </div>
+            </div>
+          </>
+          
             ) : activeTab === 2 ? (
               <>
                 <div>
