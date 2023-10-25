@@ -10,13 +10,57 @@ import { Peer } from 'peerjs';
 import axios from "axios";
 import "./style.css";
 
+const stringSimilarity = require('string-similarity');
+const api = axios.create({
+  baseURL: "https://api.openai.com/v1",
+});
+api.defaults.headers.common["Authorization"] = `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`;
+
+
 function Home() {
   const [activeTab, setActiveTab] = useState(1);
+
 
 
   const [showModalPergunta, setShowModalPergunta] = useState(false);
 
   const handleCloseModalPergunta = () => setShowModalPergunta(false);
+  const postData = async (data) => {
+    try {
+      const toSend = {
+        model: "gpt-3.5-turbo",
+        messages: [
+          {
+            role: "user",
+            content: data,
+          },
+        ],
+      };
+      const response = await api.post("/chat/completions", toSend);
+      console.log("Response data:", response.data.choices[0].message.content);
+    } catch (error) {
+      console.error("Error:", error);
+    }
+  };
+ // Utiliza a A.I (ChatGPT) para verificar qual a melhor resposta disponível com base no perfil do utilizador
+const checkBestAnswer = (question, answers, userProfile) => {
+  const prompt = `Pregunta ${question}\nRespuestas:
+   ${answers.join('\n')}\nUser Profile: ${JSON.stringify(userProfile)}\n 
+   Dígame cuál fue la mejor respuesta dada basándose en el perfil del usuario, respuesta SOLO en JSO: {"answer" : "mejor respuesta"}`;
+
+   console.log(prompt);
+   postData(prompt)
+   
+  // Call the GPT API with the prompt string
+  // ...
+}
+/*
+const question = "¿Cuál es la capital de Francia?";
+const answerChoices = ["Paris", "Berlin", "London", "Madrid"];
+const user = { name: "John", age: 30 };
+
+checkBestAnswer(question, answerChoices, user);
+*/
   const handleShowModalPergunta = () => 
   {
     setShowModalPergunta(true);
@@ -117,6 +161,32 @@ function Home() {
     };
   }, []);
 
+  // Função para comparar duas frases
+function compararFrases(frase1, frase2) {
+  // Calcula a similaridade entre as frases
+  const resultado = stringSimilarity.compareTwoStrings(frase1, frase2);
+
+  // Define um limite de similaridade (ajuste conforme necessário)
+  const limiteSimilaridade = 0.7;
+
+  // Verifica se a similaridade está acima do limite
+  const saoSemelhantes = resultado >= limiteSimilaridade;
+
+  return {
+    similaridade: resultado,
+    saoSemelhantes,
+  };
+}
+/*
+// Exemplo de uso
+const frase1 = "Qual a maior cidade de Portugal?";
+const frase2 = "Qual a maior cidade do Brasil?";
+
+const resultado = compararFrases(frase1, frase2);
+
+console.log(`Similaridade: ${resultado.similaridade}`);
+console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
+*/
   const sendDirectMessage = (id_destinatario, mensagem) => {
     const conn = peerRef.current.connect(id_destinatario);
 
@@ -149,6 +219,7 @@ function Home() {
     if(type === "DIRECT")
     {
 
+
     }else if(type === "BROADCAST")
     {
       const broadcastType = conteudo.type;
@@ -158,12 +229,14 @@ function Home() {
       //sendDirectMessage(id_remetente, "Olá " + personName + " recebi a sua mensagem");
       console.log("Resposta enviada?")
       
-      // Se for para verificar se temos uma pergunta
+      
       if(broadcastType === "QUESTION")
        {
-        // Verificamos se temos em localStorage um pergunta parecida
+        // Se for para verificar se temos uma pergunta
+      // Comparar o título de cada uma e verificar com "compararFrases()" se são semelhantes
+      // Se forem semelhantes enviamos a resposta para quem fez o broadcast
 
-        // Caso tenhamos enviamos de volta para quem nos fez broadcast
+      // Se não forem semelhantes não fazemos nada
        }
        else if(broadcastType === "GETQUESTIONS")
        {
@@ -242,11 +315,9 @@ function Home() {
 
 
 
-  const api = axios.create({
-    baseURL: "https://api.openai.com/v1",
-  });
-  api.defaults.headers.common["Authorization"] = `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`;
+
   
+  /*
   const data = {
     model: "gpt-3.5-turbo",
     messages: [
@@ -256,18 +327,9 @@ function Home() {
       },
     ],
   };
+*/
 
-  const postData = async () => {
-    try {
-      const response = await api.post("/chat/completions", data);
-      console.log("Response data:", response.data.choices[0].message.content);
-    } catch (error) {
-      console.error("Error:", error);
-    }
-  };
-  
-  postData();
-  
+
   return (
     <>
       <Navbar expand="lg" className="bg-primary">
