@@ -33,10 +33,10 @@ const ModalPergunta = ({ show, onHide, click, sendQuestion }) => {
       </Modal.Body>
       <Modal.Footer>
         <Button variant="primary" onClick={handleSendQuestion}>
-          Sim <Icon.CheckLg />
+          Enviar <Icon.CheckLg />
         </Button>
         <Button variant="secondary" onClick={onHide}>
-          Não <Icon.XLg />
+          Cancelar <Icon.XLg />
         </Button>
       </Modal.Footer>
     </Modal>
