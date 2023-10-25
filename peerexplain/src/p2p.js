@@ -1,115 +1,129 @@
-import React, { useEffect, useState } from 'react';
-import io from 'socket.io-client';
+import React, { useState, useEffect, useRef } from 'react';
+import { Peer } from 'peerjs';
+import { useLocation } from 'react-router-dom';
 
-const socket = io("http://localhost:4000", {
-  withCredentials: true, // se você quer enviar cookies ou outros cabeçalhos
-  extraHeaders: {
-    "my-custom-header": "abcd" // se você quer adicionar algum cabeçalho personalizado
-  }
-});
+function P2P ()  {
+  const [targetId, setTargetId] = useState('');
+  const [myID, setMyId] = useState('');
+  const [message, setMessage] = useState('');
+  const [allPeers, setAllPeers] = useState([]);
+  const peerRef = useRef(null);
 
-const P2P = () => {
-    const [peers, setPeers] = useState([]);
+  useEffect(() => {
+    console.log('P2P component mounted');
+    const newPeer = new Peer({
+      host: 'localhost',
+      port: 9000,
+      path: '/myapp',
+    });
 
-    useEffect(() => {
-        const peerConnections = {};
+    newPeer.on('open', () => {
+      console.log('My peer ID is: ' + newPeer.id);
+      setMyId(newPeer.id); // Atualiza o estado
 
-        const addPeer = (peerId, shouldCreateOffer = false) => {
-            const peerConnection = new RTCPeerConnection({
-                iceServers: [
-                    {
-                        urls: 'stun:stun.l.google.com:19302',
-                    },
-                ],
-            });
-            peerConnections[peerId] = peerConnection;
+      newPeer.listAllPeers((peers) => {
+        console.log('Peers conectados: ' + peers);
+        setAllPeers(peers); // Atualiza o estado
+      });
 
-            peerConnection.onicecandidate = (event) => {
-                if (event.candidate) {
-                    socket.emit('ice-candidate', {
-                        target: peerId,
-                        candidate: event.candidate,
-                    });
-                }
+      newPeer.on('connection', (conn) => {
+        conn.on('data', (data) => {
+          console.log('Recebi uma mensagem:', data);
+        });
+      });
+
+      peerRef.current = newPeer;
+    });
+
+    return () => {
+      // Encerrar a conexão ao desmontar o componente, se necessário
+      if (peerRef.current) {
+        peerRef.current.destroy();
+      }
+    };
+  }, []);
+
+  const handleSendMessage = () => {
+    const conn = peerRef.current.connect(targetId);
+
+    const messageToSend = {
+      id_remetente: myID,
+      id_destinatario: targetId,
+      type: "DIRECT", 
+      message: message
+    };
+  
+    if (conn) {
+      conn.on('open', () => {
+        console.log('Connection established');
+        conn.send(messageToSend);
+      });
+  
+      conn.on('error', (err) => {
+        console.log('Failed to connect: ' + err);
+      });
+    } else {
+      console.log('Connection not established. Check peer availability.');
+    }
+  };
+
+  const sendBroadCast = () => { 
+    allPeers.forEach((peer) => {
+
+      if (peer != myID) {
+        console.log(peer)
+        const conn = peerRef.current.connect(peer);
+
+
+  
+        if (conn) {
+          conn.on('open', () => {
+            const messageToSend = {
+              id_remetente: myID,
+              id_destinatario: peer,
+              type: "BROADCAST", 
+              message: message
             };
-
-            peerConnection.ontrack = (event) => {
-                console.log('Incoming media stream received');
-            };
-
-            if (shouldCreateOffer) {
-                peerConnection.createOffer().then((offer) => {
-                    return peerConnection.setLocalDescription(offer);
-                }).then(() => {
-                    console.log('Sending offer to peer', peerId);
-                    socket.emit('sdp', {
-                        target: peerId,
-                        sdp: peerConnection.localDescription,
-                    });
-                });
-            }
-
-            socket.on('connect', () => {
-                console.log('Connected to signaling server');
-                socket.emit('join-room', 'my-room');
-            });
-
-            socket.on('user-connected', (userId) => {
-                console.log('User connected:', userId);
-                addPeer(userId, true);
-            });
-
-            socket.on('user-disconnected', (userId) => {
-                console.log('User disconnected:', userId);
-                peerConnections[userId].close();
-                delete peerConnections[userId];
-                setPeers((prevPeers) => prevPeers.filter((peer) => peer !== userId));
-            });
-
-            socket.on('ice-candidate', ({ candidate, source }) => {
-                console.log('Received ICE candidate from peer', source);
-                const peerConnection = peerConnections[source] || addPeer(source);
-                const iceCandidate = new RTCIceCandidate(candidate);
-                peerConnection.addIceCandidate(iceCandidate);
-            });
-
-            socket.on('sdp', ({ sdp, source }) => {
-                console.log('Received SDP from peer', source);
-                const peerConnection = peerConnections[source] || addPeer(source);
-                const remoteDescription = new RTCSessionDescription(sdp);
-                peerConnection.setRemoteDescription(remoteDescription).then(() => {
-                    if (remoteDescription.type === 'offer') {
-                        return peerConnection.createAnswer();
-                    }
-                }).then((answer) => {
-                    return peerConnection.setLocalDescription(answer);
-                }).then(() => {
-                    console.log('Sending answer to peer', source);
-                    socket.emit('sdp', {
-                        target: source,
-                        sdp: peerConnection.localDescription,
-                    });
-                });
-            });
-
-            return () => {
-                socket.emit('leave-room', 'my-room');
-                Object.values(peerConnections).forEach((peerConnection) => {
-                    peerConnection.close();
-                });
-            };
+            
+            console.log('Connection established');
+            conn.send(messageToSend);
+          });
+    
+          conn.on('error', (err) => {
+            console.log('Failed to connect: ' + err);
+          });
+        } else {
+          console.log('Connection not established. Check peer availability.');
         }
-        addPeer(socket.id);
-    }, []);
+      }
+    });
+  }
 
-    return (
-        <div>
-            <p> Peers: </p>
-            {peers.map((peer) => (
-                <div key={peer}>{peer}</div>
-            ))}
-        </div>
-    );
+ 
+  return (
+    <div>
+      <div>
+        <label htmlFor="targetId">ID do peer de destino:</label>
+        <input
+          type="text"
+          id="targetId"
+          value={targetId}
+          onChange={(e) => setTargetId(e.target.value)}
+        />
+      </div>
+      <div>
+        <label htmlFor="message">Mensagem:</label>
+        <input
+          type="text"
+          id="message"
+          value={message}
+          onChange={(e) => setMessage(e.target.value)}
+        />
+      </div>
+      <button onClick={handleSendMessage}>Enviar Mensagem</button>
+      <button onClick={sendBroadCast}>Enviar Broadcast</button>
+    </div>
+  );
 };
 
 export default P2P;

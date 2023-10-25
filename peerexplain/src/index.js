@@ -8,14 +8,12 @@ import reportWebVitals from "./reportWebVitals";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
-  <React.StrictMode>
     <BrowserRouter>
       <Routes>
         <Route path="/" element={<App />} />
         <Route path="/p2p" element={<P2P />} />
       </Routes>
     </BrowserRouter>
-  </React.StrictMode>
 );
 
 reportWebVitals();
