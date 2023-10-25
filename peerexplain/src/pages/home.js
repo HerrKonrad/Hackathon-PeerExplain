@@ -5,7 +5,7 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import ModalLogin from "../components/modalLogin";
 import { Accordion } from "react-bootstrap";
-
+import { v4 as uuidv4 } from 'uuid';
 import ModalPergunta from "../components/modalPergunta";
 import { Peer } from 'peerjs';
 import axios from "axios";
@@ -249,7 +249,7 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
     const usuario = usuarioString ? JSON.parse(usuarioString): [];
     // Converte a string JSON para objeto JavaScript
     
-
+    const uuid = uuidv4();
     console.log("Enviando a pergunta para todoas");
     const nome = usuario.nome;
     const area = usuario.area;
@@ -257,6 +257,7 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
 
    // Certifique-se de que o objeto guardarQuestao tenha todas as propriedades necessárias
 const guardarQuestao = {
+  id: uuid,
   autor: usuario.nome,
   titulo: questionText,
   area: usuario.area
@@ -271,6 +272,7 @@ localStorage.setItem("minhasPerguntas", novoJSONpergunta);
     
     if (nome) {
       const question = {
+        id: uuid,
         type: "QUESTION",
         nome: nome,
         question: questionText,
