@@ -6,18 +6,21 @@ const ModalLogin = ({ show, onHide, click }) => {
   const nome = useRef("");
   const dataNasc = useRef("");
   const area = useRef("");
+  const nivelQualificacao = useRef("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
     const nomeValue = nome.current.value;
     const dataNascValue = dataNasc.current.value;
     const areaValue = area.current.value;
+    const nivelQualificacaoValue = 0;
 
 
     const user = {
       nome: nomeValue,
       data: dataNascValue,
       area: areaValue,
+      nivelQualificacao: nivelQualificacaoValue,
     };
 
     const userJSON = JSON.stringify(user);
@@ -68,6 +71,14 @@ const ModalLogin = ({ show, onHide, click }) => {
                 <option value="Ingeniería">Ingeniería</option>
                 <option value="Ciencias Ambientales">Ciencias Ambientales</option>
               </Form.Select>
+              <Form.Select aria-label="Nivel de Calificación" ref={nivelQualificacao} required>
+    <option>Nivel de Calificación</option>
+    <option value="Educación Primaria">Educación Primaria</option>
+    <option value="Educación Secundaria">Educación Secundaria</option>
+    <option value="Licenciatura">Licenciatura</option>
+    <option value="Maestría">Maestría</option>
+    <option value="Doctorado">Doctorado</option>
+</Form.Select>
             </Form.Group>
           </Form>
         </Modal.Body>
