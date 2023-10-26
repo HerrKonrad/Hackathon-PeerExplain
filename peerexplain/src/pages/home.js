@@ -64,9 +64,9 @@ function Home() {
   };
  // Utiliza a A.I (ChatGPT) para verificar qual a melhor resposta disponível com base no perfil do utilizador
 const checkBestAnswer = (question, answers, userProfile) => {
-  const prompt = `Pregunta ${question}\nRespuestas:
-   ${answers.join('\n')}\nUser Profile: ${JSON.stringify(userProfile)}\n 
-   Dígame cuál fue la mejor respuesta dada basándose en el perfil del usuario, respuesta SOLO en JSO: {"answer" : "mejor respuesta"}`;
+  const prompt = `Pregunta ${question}\nRespuestas:\n${answers.map((answer, index) => `${index + 1}. ${answer}`).join('\n')}\nUser Profile: ${JSON.stringify(userProfile)}\n 
+  Comprobar las respuestas enumeradas dadas y, basándose en los datos del perfil del usuario y prediciendo cuáles serían sus preferencias para una mejor respuesta, hacer una clasificación diciendo numéricamente de la mejor a la peor respuesta basándose en lo que parece más apropiado para el usuario. La respuesta SOLO debe ser un JSON:. La clasificación sólo debe contener el número de respuestas Ejemplo:{"ranking" : []}`;
+
 
    console.log(prompt);
    postData(prompt)
@@ -74,15 +74,15 @@ const checkBestAnswer = (question, answers, userProfile) => {
   // Call the GPT API with the prompt string
   // ...
 }
-/*
-const question = "¿Cómo funciona una transmisión manual?";
-const answerChoices = ["Una transmisión manual es un componente del vehículo que permite al conductor seleccionar manualmente las marchas del motor. Consiste en un conjunto de engranajes que conectan el motor a las ruedas. El conductor utiliza un pedal de embrague para desconectar temporalmente el motor de la transmisión, permitiendo así cambiar de marcha. Las marchas más bajas proporcionan más potencia para arrancar y subir colinas, mientras que las marchas más altas permiten una mayor velocidad en terrenos planos.", "Una transmisión manual, también conocida como caja de cambios manual, opera mediante el uso de engranajes y un embrague. El motor está conectado a un conjunto de piñones, y el conductor puede seleccionar manualmente diferentes combinaciones de piñones para variar la relación de transmisión entre el motor y las ruedas. La relación de transmisión influye en el torque y la velocidad del vehículo.
 
-El embrague es crucial en este proceso. Cuando el conductor presiona el pedal del embrague, se desconecta temporalmente el motor de la transmisión, permitiendo cambiar de marcha sin detener el vehículo. Al liberar gradualmente el pedal del embrague, se vuelve a conectar el motor y la transmisión de manera suave."];
-const user = { name: "John", age: 30, levelOfEducation: "master degree", field : "History"  };
+
+
+const question = "¿Cómo funciona una transmisión manual?";
+const answerChoices = ["Una transmisión manual es un componente del vehículo que permite al conductor seleccionar manualmente las marchas del motor. Consiste en un conjunto de engranajes que conectan el motor a las ruedas. El conductor utiliza un pedal de embrague para desconectar temporalmente el motor de la transmisión, permitiendo así cambiar de marcha. Las marchas más bajas proporcionan más potencia para arrancar y subir colinas, mientras que las marchas más altas permiten una mayor velocidad en terrenos planos.", "Una transmisión manual es como una caja de juguetes con diferentes engranajes. El motor del auto está conectado a estos engranajes, y el conductor puede elegir diferentes combinaciones para hacer que el auto vaya más rápido o más lento. Es como cambiar la velocidad de tu bicicleta, ¡pero para un carro!",];
+const user = { name: "John", age: 10, levelOfEducation: "Primary", field : "History"  };
 
 checkBestAnswer(question, answerChoices, user);
-*/
+
   const handleShowModalPergunta = () => 
   {
     setShowModalPergunta(true);
