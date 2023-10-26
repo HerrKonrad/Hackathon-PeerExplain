@@ -11,6 +11,7 @@ import { Peer } from 'peerjs';
 import axios from "axios";
 
 import "./style.css";
+import ModalMelhorResposta from "../components/modalMelhorResposta";
 
 const stringSimilarity = require('string-similarity');
 const api = axios.create({
@@ -26,8 +27,24 @@ function Home() {
 
 
   const [showModalPergunta, setShowModalPergunta] = useState(false);
-
   const handleCloseModalPergunta = () => setShowModalPergunta(false);
+
+
+
+  const [showModalMelhorResposta, setShowModalMelhorResposta] = useState(false);
+  const [selectedObject, setSelectedObject] = useState(null);
+
+  const handleShowModal = (objeto) => {
+    setSelectedObject(objeto);
+    setShowModalMelhorResposta(true);
+  };
+
+  const handleCloseModalMelhorResposta = () => {
+    setSelectedObject(null);
+    setShowModalMelhorResposta(false);
+  };
+
+
   const postData = async (data) => {
     try {
       const toSend = {
@@ -209,17 +226,30 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
         answers.forEach((answer) => {
           // Compare the question with the answer's title using the compararFrases function
           const similarity = compararFrases(question, answer.titulo);
-          console.log("Titulo", answer.titulo)
+          //console.log("Titulo", answer.titulo)
 
           // If the similarity is above a certain threshold, add the answer to the matchingAnswers array
           if (similarity.saoSemelhantes) {
-            matchingAnswers.message.answer.push(answer);
+
+            matchingAnswers.push(answer);
+
+            //enviar as respostas para o utilizador se tiver
+
           }
         });
 
+        console.log(conteudo);
 
-    
-      console.log("Respostas semelhantes", matchingAnswers); 
+        const existingDataJSON = localStorage.getItem("outrasPerguntas");
+        const existingData = existingDataJSON ? JSON.parse(existingDataJSON) : [];
+
+        existingData.push(conteudo);
+
+        const updatedDataJSON = JSON.stringify(existingData);
+
+        localStorage.setItem("outrasPerguntas", updatedDataJSON);
+
+      //console.log("Respostas semelhantes", matchingAnswers); 
 
       // Se forem semelhantes enviamos a resposta para quem fez o broadcast
       /*
@@ -323,6 +353,13 @@ localStorage.setItem("minhasPerguntas", novoJSONpergunta);
 
 
 
+  const outasPerguntasLocal = localStorage.getItem("outrasPerguntas");
+  var outrasPerguntas = JSON.parse(outasPerguntasLocal);
+  if (outrasPerguntas) {
+    var outrasPerguntasArray = Object.values(outrasPerguntas);
+  }
+
+
 
   
   /*
@@ -366,7 +403,7 @@ localStorage.setItem("minhasPerguntas", novoJSONpergunta);
           <div className="col-md-12">
             {activeTab === 1 ? (
             <>
-            <div className="accordion" id="usersAccordion">
+            <div className="accordion mt-3" id="usersAccordion">
               <div className="accordion-item">
                 <h2 className="accordion-header" id="usersHeading">
                   <button
@@ -390,15 +427,17 @@ localStorage.setItem("minhasPerguntas", novoJSONpergunta);
                     { minhasPerguntasArray ? (
                           minhasPerguntasArray.map((perguntas, index) => (
                             <div className="card mt-3" key={index}>
-                              <div className="card-header">{perguntas.autor}</div>
+                              <div className="card-header">{perguntas.autor} | {perguntas.area}</div>
                               <div className="card-body">
-                                <h5 className="card-title">{perguntas.titulo}</h5>
-                                <p className="card-text">{perguntas.area}</p>
+                                <p className="card-text">{perguntas.titulo}</p>
                                 <div className="d-md-flex justify-content-md-end">
-                                  <a href="#" className="btn btn-primary">
+                                  <a className="btn btn-primary" onClick={() => handleShowModal(perguntas)}>
                                     Más información
                                   </a>
                                 </div>
+                                {selectedObject ? (
+                                  <ModalMelhorResposta show={showModalMelhorResposta} onHide={handleCloseModalMelhorResposta} objeto={selectedObject}/>
+                                ) : (null)}
                               </div>
                             </div>
                           ))
@@ -420,19 +459,61 @@ localStorage.setItem("minhasPerguntas", novoJSONpergunta);
           
             ) : activeTab === 2 ? (
               <>
-                <div>
-                  
+                 <div className="accordion mt-3" id="usersAccordion">
+              <div className="accordion-item">
+                <h2 className="accordion-header" id="usersHeading">
+                  <button
+                    className={`accordion-button ${!isAccordionOpen ? 'bg-white' : ''}`} // Adicione a classe condicional aqui
+                    type="button"
+                    aria-expanded={isAccordionOpen}
+                    onClick={() => setIsAccordionOpen(!isAccordionOpen)}
+                    aria-controls="collapseOne"
+                  >
+                    Outras Preguntas:
+                  </button>
+                </h2>
+                <div
+                  id="usersCollapse"
+                  className={`accordion-collapse collapse ${isAccordionOpen ? 'show' : ''}`}
+                  aria-labelledby="usersHeading"
+                  data-bs-parent="#usersAccordion"
+                >
+                  <div className="accordion-body" style={{ maxHeight: "1000px", overflowY: "auto" }}>
+                    <ul className="list-group">
+                    { outrasPerguntasArray ? (
+                          outrasPerguntasArray.map((perguntas, index) => (
+                            <div className="card mt-3" key={index}>
+                              <div className="card-header">{perguntas.nome}</div>
+                              <div className="card-body">
+                                <p className="card-text">{perguntas.question}</p>
+                                <div className="d-md-flex justify-content-md-end">
+                                  <a className="btn btn-primary" onClick={() => handleShowModal(perguntas)}>
+                                    Responder
+                                  </a>
+                                </div>
+                                {selectedObject ? (
+                                  <>teste</>
+                                ) : (null)}
+                              </div>
+                            </div>
+                          ))
+                        ) : (
+                          <p>No hay datos disponibles.</p>
+                        )}
+                    </ul>
+                  </div>
                 </div>
+              </div>
+              <div class="fab">
+                <button class="main" onClick={handleShowModalPergunta}>
+                  <Icon.PlusLg />
+                </button>
+                <ModalPergunta show={showModalPergunta} onHide={handleCloseModalPergunta} click={handleCloseModalPergunta} sendQuestion={sendQuestion} />
+              </div>
+            </div>
               </>
-            ) : activeTab === 3 ? (
-              <>
-                <div>teste 3</div>
-              </>
-            ) : activeTab === 4 ? (
-              <>
-                <div>teste 4</div>
-              </>
-            ) : null}
+            ) 
+             : null}
           </div>
 
 

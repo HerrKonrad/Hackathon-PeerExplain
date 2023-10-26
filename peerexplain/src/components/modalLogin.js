@@ -13,6 +13,7 @@ const ModalLogin = ({ show, onHide, click }) => {
     const dataNascValue = dataNasc.current.value;
     const areaValue = area.current.value;
 
+
     const user = {
       nome: nomeValue,
       data: dataNascValue,
@@ -54,14 +55,19 @@ const ModalLogin = ({ show, onHide, click }) => {
                 ref={dataNasc}
                 required
               />
-              <Form.Label>Área de Estudo</Form.Label>
-              <Form.Control
-                type="text"
-                name="areaDeEstudo"
-                className="mb-3"
-                ref={area}
-                required
-              />
+              <Form.Select aria-label="Área de Estudo" ref={area} required>
+                <option>Área de Estudo</option>
+                <option value="Biología">Biología</option>
+                <option value="Química">Química</option>
+                <option value="Física">Física</option>
+                <option value="Matemáticas">Matemáticas</option>
+                <option value="Ciencias Sociales">Ciencias Sociales</option>
+                <option value="Informática">Informática</option>
+                <option value="Artes">Artes</option>
+                <option value="Medicina">Medicina</option>
+                <option value="Ingeniería">Ingeniería</option>
+                <option value="Ciencias Ambientales">Ciencias Ambientales</option>
+              </Form.Select>
             </Form.Group>
           </Form>
         </Modal.Body>
