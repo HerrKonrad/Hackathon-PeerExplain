@@ -71,12 +71,14 @@ function Home() {
 
   
  // Utiliza a A.I (ChatGPT) para verificar qual a melhor resposta disponível com base no perfil do utilizador
-const checkBestAnswer = (question, answers, userProfile) => {
-  const prompt = `Pregunta ${question}\nRespuestas:\n${answers.map((answer, index) => `${index + 1}. ${answer}`).join('\n')}\nUser Profile: ${JSON.stringify(userProfile)}\n Comprobar las respuestas enumeradas dadas y, basándose en los datos del perfil del usuario y prediciendo cuáles serían sus preferencias para una mejor respuesta, hacer una clasificación diciendo numéricamente de la mejor a la peor respuesta basándose en lo que parece más apropiado para el usuario. La respuesta SOLO debe ser un JSON:. La clasificación sólo debe contener el número de respuestas Ejemplo:{"ranking" : []}`;
-    console.log(prompt);
-    postData(prompt);
-    return prompt;
+const checkBestAnswer = async (question, answers, userProfile) => {
+  const prompt = `Pregunta ${question}\nRespuestas:\n${answers.map((answer, index) => `${index + 1}. ${answer}`).join('\n')}\nUser Profile: ${JSON.stringify(userProfile)}\n Comprobar las respuestas enumeradas dadas y, basándose en los datos del perfil del usuario y prediciendo cuáles serían sus preferencias para una mejor respuesta, hacer una clasificación diciendo numéricamente de la mejor a la peor respuesta basándose en lo que parece más apropiado para el usuario. La respuesta SOLO debe ser un JSON, 
+  y nada más:. La clasificación sólo debe contener el número de respuestas Ejemplo:{"ranking" : []}`;
+   const resposta = await postData(prompt);
+    
+    return resposta
 }
+
 
 
 
@@ -196,24 +198,70 @@ const checkBestAnswer = (question, answers, userProfile) => {
       if(directType === "ANSWER")
       {
         console.log("Recebi uma resposta");
-        const question = conteudo.question;
-        
-       
-        const answers = question.answers;
 
-        // reeordenar as respostas por ordem de melhor resposta
-      const utilizador = localStorage.getItem('Utilizador');
-      if(utilizador && question && answers)
-      {
-            const rankingAnswerJSON =  checkBestAnswer(question, answers, utilizador);
-      const rankingAnswer = rankingAnswerJSON ? JSON.parse(rankingAnswerJSON) : [];
-      console.log("Ranking", rankingAnswer);
-      
-      }
-      const rankingAnswerJSON =  checkBestAnswer(question, answers, utilizador);
-      const rankingAnswer = rankingAnswerJSON ? JSON.parse(rankingAnswerJSON) : [];
-      console.log("Ranking", rankingAnswer);
-      
+        const question = message.message.questions;
+
+        const answers = question.answers;
+        const questionId = message.message.id_original_question;
+        
+        // reordenar as respostas por ordem de melhor resposta
+        const usuarioString = localStorage.getItem("Utilizador");
+        const utilizador = usuarioString ? JSON.parse(usuarioString) : [];
+        console.log(questionId);
+        
+        if (utilizador && question && answers.length > 0) {
+          console.log("Entrou");
+        
+          async function obterRanking() {
+            const rankingAnswer = await checkBestAnswer(question, answers, utilizador);
+            console.log("Ranking", rankingAnswer);
+        
+            if (rankingAnswer) {
+              const minhasPerguntasString = localStorage.getItem("minhasPerguntas");
+              const minhasPerguntas = minhasPerguntasString ? JSON.parse(minhasPerguntasString) : [];
+        
+              minhasPerguntas.forEach(async (p) => {
+                const p_id = p.id;
+                console.log("Pergunta", p_id);
+              
+                if (compararFrases(p.question, question.question)) {
+                  console.log("...");
+              
+                  const jsonConv = JSON.parse(rankingAnswer);
+                  const orderedAnswers = jsonConv.ranking.map((rank) => {
+                    return answers[rank - 1];
+                  });
+              
+                  console.log("Resposta", p.answers);
+                  console.log("Ordered answers:", orderedAnswers);
+              
+                  if (!p.answers) {
+                    p.answers = [];
+                  }
+              
+                  // Adiciona orderedAnswers ao array p.answers
+                  p.answers.push(...orderedAnswers);
+              
+                  console.log("Objeto editar", p);
+                  
+                  // Atualiza o localStorage ou o que for necessário
+                  const respostaString = localStorage.getItem("minhasPerguntas");
+                  const outrasRespostas = respostaString ? JSON.parse(respostaString) : [];
+                  const index = outrasRespostas.findIndex((item) => item.id === p_id);
+              
+                  if (index !== -1) {
+                    outrasRespostas[index] = p;
+                    localStorage.setItem("minhasPerguntas", JSON.stringify(outrasRespostas));
+                  }
+                }
+              });
+            }
+          }
+        
+          obterRanking();
+        }
+        
+  
       }
 
     }else if(type === "BROADCAST")
@@ -288,7 +336,8 @@ console.log(matchingAnswers.message.answers );
 const conteudo_resposta =
 {
   "type" : "ANSWER",
-  "id_original_question" : id_question,
+
+
   questions : matchingAnswers.message.answers[0]
 }
 if(matchingAnswers.message.answers.length > 0)
@@ -329,7 +378,9 @@ questionsReceived.forEach((question) => {
       autor: usuario.nome,
       question: questionText,
       area: usuario.area,
-      answers: [],
+
+      answers: []
+
     };
     // Resto do código para adicionar ao localStorage
     var JSONperguntaExistente = localStorage.getItem("minhasPerguntas");
