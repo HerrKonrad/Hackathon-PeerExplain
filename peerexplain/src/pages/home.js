@@ -110,30 +110,33 @@ const checkBestAnswer = async (question, answers, userProfile) => {
     console.log("P2P component mounted");
     const newPeer = new Peer({
 
-      host: "192.168.243.173",
+      host: "localhost",
 
       port: 9000,
       path: "/myapp",
     });
 
-    newPeer.on("open", () => {
-      console.log("My peer ID is: " + newPeer.id);
-      setMyId(newPeer.id); // Atualiza o estado
-
-      newPeer.listAllPeers((peers) => {
-        console.log("Peers conectados: " + peers);
-        setAllPeers(peers); // Atualiza o estado
-      });
-
-      newPeer.on("connection", (conn) => {
-        conn.on("data", (data) => {
-          console.log("Recebi uma mensagem:", data);
-          handleReceiveMessage(data);
+   
+      newPeer.on("open", () => {
+        console.log("My peer ID is: " + newPeer.id);
+        setMyId(newPeer.id); // Atualiza o estado
+  
+        newPeer.listAllPeers((peers) => {
+          console.log("Peers conectados: " + peers);
+          setAllPeers(peers); // Atualiza o estado
         });
+  
+        newPeer.on("connection", (conn) => {
+          conn.on("data", (data) => {
+            console.log("Recebi uma mensagem:", data);
+            handleReceiveMessage(data);
+          });
+        });
+  
+        peerRef.current = newPeer;
       });
-
-      peerRef.current = newPeer;
-    });
+      
+  
 
     return () => {
       // Encerrar a conexão ao desmontar o componente, se necessário
