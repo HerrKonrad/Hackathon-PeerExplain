@@ -114,7 +114,9 @@ const checkBestAnswer = (question, answers, userProfile) => {
   useEffect(() => {
     console.log("P2P component mounted");
     const newPeer = new Peer({
+
       host: "localhost",
+
       port: 9000,
       path: "/myapp",
     });
@@ -248,8 +250,8 @@ const checkBestAnswer = (question, answers, userProfile) => {
 // Loop through each answer in the list
 questions.forEach((q) => {
   // Compare the question with the answer's title using the compararFrases function
-  const similarity = compararFrases(question, q.titulo);
-  //console.log("Titulo", answer.titulo)
+  const similarity = compararFrases(question, q.question);
+  //console.log("question", answer.question)
 
 
   // If the similarity is above a certain threshold, add the answer to the matchingAnswers array
@@ -330,7 +332,7 @@ questionsReceived.forEach((question) => {
     const guardarQuestao = {
       id: uuid,
       autor: usuario.nome,
-      titulo: questionText,
+      question: questionText,
       area: usuario.area,
     };
     // Resto do código para adicionar ao localStorage
@@ -428,7 +430,7 @@ questionsReceived.forEach((question) => {
                         {perguntas.autor} | {perguntas.area}
                       </div>
                       <div className="card-body">
-                        <p className="card-text">{perguntas.titulo}</p>
+                        <p className="card-text">{perguntas.question}</p>
                         <div className="d-md-flex justify-content-center">TEXTO DA MELHOR PERGUNTA</div>
                       </div>
                     </div>

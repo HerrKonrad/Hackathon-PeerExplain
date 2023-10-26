@@ -4,10 +4,9 @@ import { useState } from 'react';  // Importe o useState para gerenciar o estado
 
 const ModalRespostas = ({ show, onHide, objeto }) => {
   const [pergunta, setPergunta] = useState('');  // Estado para armazenar o valor do textarea
-  const [novanota, setNovanota] = useState("");
-  console.log(objeto);  
+  const [novaResposta, setNovaResposta] = useState(""); 
   const arrayResposta = objeto.answers;
-  console.log(objeto.answers);
+
   function handleKeyDown(event) {
     if (event.keyCode === 13) {
       handleNovaResposta();
@@ -15,11 +14,42 @@ const ModalRespostas = ({ show, onHide, objeto }) => {
   }
 
   const handleInput = (event) => {
-    setNovanota(event.target.value);
+    setNovaResposta(event.target.value);
   };
 
+  // para obter o nome do utilizador
+  const usuarioString = localStorage.getItem("Utilizador");
+  const usuario = usuarioString ? JSON.parse(usuarioString) : [];
+  const nome = usuario.nome;
+
+  const outrasRespostasString = localStorage.getItem("outrasPerguntas");
+  const outrasRespostas = outrasRespostasString ? JSON.parse(outrasRespostasString) : [];
+  console.log(objeto.id);
+  console.log(outrasRespostas);
+
+  const resposta = {
+    nome: nome,
+    conteudo: novaResposta,
+  }
+
   const handleNovaResposta = async () => {
-    setNovanota("");
+
+    const outrasRespostasString = localStorage.getItem("outrasPerguntas");
+    const outrasRespostas = outrasRespostasString ? JSON.parse(outrasRespostasString) : [];
+      
+    const objetoParaEditar = outrasRespostas.find(item => item.id === objeto.id);
+      
+    if (objetoParaEditar) {
+
+      if (!objetoParaEditar.answers) {
+        objetoParaEditar.answers = [];
+      }
+      objetoParaEditar.answers.push(resposta);
+    
+      localStorage.setItem("outrasPerguntas", JSON.stringify(outrasRespostas));
+    }
+
+    setNovaResposta("");
   };
 
   return (
@@ -56,7 +86,7 @@ const ModalRespostas = ({ show, onHide, objeto }) => {
               type="text"
               className="form-control"
               placeholder="Introduza uma resposta..."
-              value={novanota}
+              value={novaResposta}
               onChange={handleInput}
               onKeyDown={handleKeyDown}
             />
