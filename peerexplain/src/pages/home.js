@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from "uuid";
 import ModalPergunta from "../components/modalPergunta";
 import { Peer } from "peerjs";
 import axios from "axios";
+import ModalRespostas from "../components/modalRespostas";
 
 import "./style.css";
 import ModalMelhorResposta from "../components/modalMelhorResposta";
@@ -25,8 +26,9 @@ function Home() {
   const [isAccordionOpen, setIsAccordionOpen] = useState(true);
 
   const [showModalPergunta, setShowModalPergunta] = useState(false);
-  const handleCloseModalPergunta = () => setShowModalPergunta(false);
-
+  const handleCloseModalPergunta = () => setShowModalPergunta(false);  
+  const [showModalRespostas, setShowModalRespostas] = useState(false);
+  const handleCloseModalRespostas = () => setShowModalRespostas(false);
   const [showModalMelhorResposta, setShowModalMelhorResposta] = useState(false);
   const [selectedObject, setSelectedObject] = useState(null);
 
@@ -53,21 +55,25 @@ function Home() {
       };
       const response = await api.post("/chat/completions", toSend);
       console.log("Response data:", response.data.choices[0].message.content);
+      return response.data.choices[0].message.content;
     } catch (error) {
       console.error("Error:", error);
+      return ""
     }
   };
-  // Utiliza a A.I (ChatGPT) para verificar qual a melhor resposta disponível com base no perfil do utilizador
-  const checkBestAnswer = (question, answers, userProfile) => {
-    const prompt = `Pregunta ${question}\nRespuestas:\n${answers.map((answer, index) => `${index + 1}. ${answer}`).join("\n")}\nUser Profile: ${JSON.stringify(userProfile)}\n 
-  Comprobar las respuestas enumeradas dadas y, basándose en los datos del perfil del usuario y prediciendo cuáles serían sus preferencias para una mejor respuesta, hacer una clasificación diciendo numéricamente de la mejor a la peor respuesta basándose en lo que parece más apropiado para el usuario. La respuesta SOLO debe ser un JSON:. La clasificación sólo debe contener el número de respuestas Ejemplo:{"ranking" : []}`;
+
+  
+ // Utiliza a A.I (ChatGPT) para verificar qual a melhor resposta disponível com base no perfil do utilizador
+const checkBestAnswer = (question, answers, userProfile) => {
+  const prompt = `Pregunta ${question}\nRespuestas:\n${answers.map((answer, index) => `${index + 1}. ${answer}`).join('\n')}\nUser Profile: ${JSON.stringify(userProfile)}\n Comprobar las respuestas enumeradas dadas y, basándose en los datos del perfil del usuario y prediciendo cuáles serían sus preferencias para una mejor respuesta, hacer una clasificación diciendo numéricamente de la mejor a la peor respuesta basándose en lo que parece más apropiado para el usuario. La respuesta SOLO debe ser un JSON:. La clasificación sólo debe contener el número de respuestas Ejemplo:{"ranking" : []}`;
 
     console.log(prompt);
     postData(prompt);
 
-    // Call the GPT API with the prompt string
-    // ...
-  };
+
+}
+
+
 
   const question = "¿Cómo funciona una transmisión manual?";
   const answerChoices = [
@@ -76,10 +82,14 @@ function Home() {
   ];
   const user = { name: "John", age: 10, levelOfEducation: "Primary", field: "History" };
 
-  checkBestAnswer(question, answerChoices, user);
 
   const handleShowModalPergunta = () => {
     setShowModalPergunta(true);
+  };
+
+  const handleShowModalRespostas = () => 
+  {
+    setShowModalRespostas(true);
   };
 
   const [showModalLogin, setShowModalLogin] = useState(true);
@@ -187,11 +197,32 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
   const handleReceiveMessage = (message) => {
     const id_remetente = message.id_remetente;
     const type = message.type;
-    const conteudo = message.message;
-    if (type === "DIRECT") {
-    } else if (type === "BROADCAST") {
+
+    const conteudo = message.message
+    const personName = conteudo.personName;
+    if(type === "DIRECT")
+    {
+      const directType = conteudo.type;
+
+      if(directType === "ANSWER")
+      {
+        console.log("Recebi uma resposta");
+        const question = conteudo.question;
+       // const id_question = question.id; 
+       /*
+        const answers = question.answers;
+
+        // reeordenar as respostas por ordem de melhor resposta
+      const utilizador = localStorage.getItem('Utilizador');
+      const rankingAnswerJSON =  checkBestAnswer(question, answers, utilizador);
+      const rankingAnswer = rankingAnswerJSON ? JSON.parse(rankingAnswerJSON) : [];
+      console.log("Ranking", rankingAnswer);
+      */
+      }
+
+    }else if(type === "BROADCAST")
+    {
       const broadcastType = conteudo.type;
-      const personName = conteudo.personName;
 
       // Remover
       //sendDirectMessage(id_remetente, "Olá " + personName + " recebi a sua mensagem");
@@ -205,53 +236,78 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
         // Define a function to compare a question with a list of answers
 
         // Create an empty array to store the matching answers
-        const matchingAnswers = { id_remetente: id_remetente, id_destinatario: myID, type: "DIRECT", message: { type: "ANSWER", answer: [] } };
-        const answers = minhasPerguntas;
 
-        // Loop through each answer in the list
-        answers.forEach((answer) => {
-          // Compare the question with the answer's title using the compararFrases function
-          const similarity = compararFrases(question, answer.titulo);
-          //console.log("Titulo", answer.titulo)
+       const matchingAnswers = {"id_remetente" : id_remetente, "id_destinatario" : myID, "type" : "DIRECT", "message" : {"type" : "ANSWER", "answers" : [] }};
+      
+       const questions = minhasPerguntas;
+       // console.log(questions)
+        
+        if(questions)
+        {
+// Loop through each answer in the list
+questions.forEach((q) => {
+  // Compare the question with the answer's title using the compararFrases function
+  const similarity = compararFrases(question, q.titulo);
+  //console.log("Titulo", answer.titulo)
 
-          // If the similarity is above a certain threshold, add the answer to the matchingAnswers array
-          if (similarity.saoSemelhantes) {
-            matchingAnswers.push(answer);
+  // If the similarity is above a certain threshold, add the answer to the matchingAnswers array
+  if (similarity.saoSemelhantes) {
 
-            //enviar as respostas para o utilizador se tiver
-          }
-        });
+    matchingAnswers.message.answers.push(q);
 
-        console.log(conteudo);
+    //enviar as respostas para o utilizador se tiver
 
-        const existingDataJSON = localStorage.getItem("outrasPerguntas");
-        const existingData = existingDataJSON ? JSON.parse(existingDataJSON) : [];
+  }
+});
 
-        existingData.push(conteudo);
 
-        const updatedDataJSON = JSON.stringify(existingData);
 
-        localStorage.setItem("outrasPerguntas", updatedDataJSON);
+const existingDataJSON = localStorage.getItem("outrasPerguntas");
+const existingData = existingDataJSON ? JSON.parse(existingDataJSON) : [];
 
-        //console.log("Respostas semelhantes", matchingAnswers);
+existingData.push(conteudo);
 
-        // Se forem semelhantes enviamos a resposta para quem fez o broadcast
-        /*
-      const resposta = {
-        "respostas" : {
-        "1" : { "conteudo" : "xpto", "autor" : "o pai"},
-        "2" : {"conteudo" : "xptooooo", "autor" : "o pai"}
+const updatedDataJSON = JSON.stringify(existingData);
+
+localStorage.setItem("outrasPerguntas", updatedDataJSON);
+//matchingAnswers.push(matchingAnswers)
+
+
+//console.log("Respostas semelhantes", matchingAnswers); 
+
+// Se forem semelhantes enviamos a resposta para quem fez o broadcast
+/*
+const resposta = {
+"respostas" : {
+"1" : { "conteudo" : "xpto", "autor" : "o pai"},
+"2" : {"conteudo" : "xptooooo", "autor" : "o pai"}
+}
+}
+matchingAnswers.push(resposta)
+*/
+
+console.log(matchingAnswers.message.answers );
+const conteudo_resposta =
+{
+  "type" : "ANSWER",
+  questions : matchingAnswers.message.answers
+}
+if(matchingAnswers.message.answers.length > 0)
+sendDirectMessage(id_remetente, conteudo_resposta);
+
+//const questionsReceived = matchingAnswers.message.answer;
+
+/*
+questionsReceived.forEach((question) => { 
+
+
+});
+*/
+        }
+        
       }
-    }
-   matchingAnswers.push(resposta)
-   */
-
-        if (matchingAnswers.message.answer > 0) sendDirectMessage(id_remetente, matchingAnswers);
-
-        const questionsReceived = matchingAnswers.message.answer;
-
-        questionsReceived.forEach((question) => {});
-      } else if (broadcastType === "GETQUESTIONS") {
+       else if(broadcastType === "GETQUESTIONS")
+       {
         // Um pedido para enviarmos todas perguntas que temos, enviamos tudo.
       }
     }
@@ -334,17 +390,6 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
     var outrasPerguntasArray = Object.values(outrasPerguntas);
   }
 
-  /*
-  const data = {
-    model: "gpt-3.5-turbo",
-    messages: [
-      {
-        role: "user",
-        content: "Nome de 3 gatos",
-      },
-    ],
-  };
-*/
 
   return (
     <>
