@@ -202,24 +202,23 @@ const checkBestAnswer = (question, answers, userProfile) => {
       if(directType === "ANSWER")
       {
         console.log("Recebi uma resposta");
-        const question = conteudo.question;
+        const question = message.message.questions;        ;
        // const id_question = question.id; 
        
         const answers = question.answers;
 
         // reeordenar as respostas por ordem de melhor resposta
-      const utilizador = localStorage.getItem('Utilizador');
-      if(utilizador && question && answers)
+        const usuarioString = localStorage.getItem("Utilizador");
+    const utilizador = usuarioString ? JSON.parse(usuarioString) : [];
+    console.log(question)
+      if(utilizador && question && answers.length > 0)
       {
-            const rankingAnswerJSON =  checkBestAnswer(question, answers, utilizador);
-      const rankingAnswer = rankingAnswerJSON ? JSON.parse(rankingAnswerJSON) : [];
-      console.log("Ranking", rankingAnswer);
-      
-      }
+     console.log("Entrou")
       const rankingAnswerJSON =  checkBestAnswer(question, answers, utilizador);
       const rankingAnswer = rankingAnswerJSON ? JSON.parse(rankingAnswerJSON) : [];
-      console.log("Ranking", rankingAnswer);
-      
+      console.log("Ranking", rankingAnswerJSON);
+      }
+  
       }
 
     }else if(type === "BROADCAST")
@@ -294,7 +293,7 @@ console.log(matchingAnswers.message.answers );
 const conteudo_resposta =
 {
   "type" : "ANSWER",
-  questions : matchingAnswers.message.answers
+  questions : matchingAnswers.message.answers[0]
 }
 if(matchingAnswers.message.answers.length > 0)
 sendDirectMessage(id_remetente, conteudo_resposta);
@@ -334,6 +333,7 @@ questionsReceived.forEach((question) => {
       autor: usuario.nome,
       question: questionText,
       area: usuario.area,
+      answers: []
     };
     // Resto do código para adicionar ao localStorage
     var JSONperguntaExistente = localStorage.getItem("minhasPerguntas");
