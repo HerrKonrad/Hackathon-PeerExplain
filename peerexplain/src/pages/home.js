@@ -117,24 +117,27 @@ const checkBestAnswer = async (question, answers, userProfile) => {
       path: "/myapp",
     });
 
-    newPeer.on("open", () => {
-      console.log("My peer ID is: " + newPeer.id);
-      setMyId(newPeer.id); // Atualiza o estado
-
-      newPeer.listAllPeers((peers) => {
-        console.log("Peers conectados: " + peers);
-        setAllPeers(peers); // Atualiza o estado
-      });
-
-      newPeer.on("connection", (conn) => {
-        conn.on("data", (data) => {
-          console.log("Recebi uma mensagem:", data);
-          handleReceiveMessage(data);
+   
+      newPeer.on("open", () => {
+        console.log("My peer ID is: " + newPeer.id);
+        setMyId(newPeer.id); // Atualiza o estado
+  
+        newPeer.listAllPeers((peers) => {
+          console.log("Peers conectados: " + peers);
+          setAllPeers(peers); // Atualiza o estado
         });
+  
+        newPeer.on("connection", (conn) => {
+          conn.on("data", (data) => {
+            console.log("Recebi uma mensagem:", data);
+            handleReceiveMessage(data);
+          });
+        });
+  
+        peerRef.current = newPeer;
       });
-
-      peerRef.current = newPeer;
-    });
+      
+  
 
     return () => {
       // Encerrar a conexão ao desmontar o componente, se necessário

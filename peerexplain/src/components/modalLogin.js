@@ -13,7 +13,7 @@ const ModalLogin = ({ show, onHide, click }) => {
     const nomeValue = nome.current.value;
     const dataNascValue = dataNasc.current.value;
     const areaValue = area.current.value;
-    const nivelQualificacaoValue = 0;
+    const nivelQualificacaoValue = nivelQualificacao.current.value;
 
 
     const user = {
