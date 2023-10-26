@@ -44,6 +44,14 @@ function Home() {
     setShowModalMelhorResposta(true);
   };
 
+  const [selectedObjectRespostas, setSelectedObjectRespostas] = useState(null);
+  
+  const handleShowModalRespostas = (objeto) => 
+  {
+    setSelectedObjectRespostas(objeto);
+    setShowModalRespostas(true);
+  };
+
   const handleCloseModalMelhorResposta = () => {
     setSelectedObject(null);
     setShowModalMelhorResposta(false);
@@ -96,10 +104,6 @@ const user = { name: "John", age: 10, levelOfEducation: "Primary", field : "Hist
     setShowModalPergunta(true);
   };
 
-  const handleShowModalRespostas = () => 
-  {
-    setShowModalRespostas(true);
-  };
 
   const [showModalLogin, setShowModalLogin] = useState(true);
 
@@ -238,16 +242,15 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
       if(broadcastType === "QUESTION")
        {
         console.log("Recebi uma pergunta");
-        const question = conteudo.question;
+        const question = conteudo.question; 
         // Se for para verificar se temos uma pergunta
       // Comparar o título de cada uma e verificar com "compararFrases()" se são semelhantes
       // Define a function to compare a question with a list of answers
-
         // Create an empty array to store the matching answers
        const matchingAnswers = {"id_remetente" : id_remetente, "id_destinatario" : myID, "type" : "DIRECT", "message" : {"type" : "ANSWER", "answer" : [] }};
-        const answers = minhasPerguntas;
+       const answers = minhasPerguntasArray;
 
-        
+        console.log(answers);
 
         // Loop through each answer in the list
         answers.forEach((answer) => {
@@ -503,13 +506,13 @@ localStorage.setItem("minhasPerguntas", novoJSONpergunta);
                               <div className="card-body">
                                 <p className="card-text">{perguntas.question}</p>
                                 <div className="d-md-flex justify-content-md-end">
-                                  <a className="btn btn-primary" onClick={handleShowModalRespostas} >
+                                  <a className="btn btn-primary" onClick={() => handleShowModalRespostas(perguntas)} >
                                     Responder
                                   </a>
                                 </div>
-                                
-                                 <ModalRespostas show={showModalRespostas} onHide={handleCloseModalRespostas} click={handleCloseModalRespostas} />
-                                
+                                {selectedObjectRespostas ? ( 
+                                 <ModalRespostas show={showModalRespostas} onHide={handleCloseModalRespostas} click={handleCloseModalRespostas} objeto={selectedObjectRespostas}/>
+                                ): (null)}
                               </div>
                             </div>
                           ))
@@ -524,7 +527,6 @@ localStorage.setItem("minhasPerguntas", novoJSONpergunta);
                 <button class="main" onClick={handleShowModalPergunta}>
                   <Icon.PlusLg />
                 </button>
-                <ModalPergunta show={showModalPergunta} onHide={handleCloseModalPergunta} click={handleCloseModalPergunta} sendQuestion={sendQuestion} />
               </div>
             </div>
               </>
