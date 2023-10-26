@@ -5,31 +5,27 @@ import Nav from "react-bootstrap/Nav";
 import Navbar from "react-bootstrap/Navbar";
 import ModalLogin from "../components/modalLogin";
 import { Accordion } from "react-bootstrap";
-import { v4 as uuidv4 } from 'uuid';
+import { v4 as uuidv4 } from "uuid";
 import ModalPergunta from "../components/modalPergunta";
-import { Peer } from 'peerjs';
+import { Peer } from "peerjs";
 import axios from "axios";
 
 import "./style.css";
 import ModalMelhorResposta from "../components/modalMelhorResposta";
 
-const stringSimilarity = require('string-similarity');
+const stringSimilarity = require("string-similarity");
 const api = axios.create({
   baseURL: "https://api.openai.com/v1",
 });
 api.defaults.headers.common["Authorization"] = `Bearer ${process.env.REACT_APP_OPENAI_API_KEY}`;
-
 
 function Home() {
   const [activeTab, setActiveTab] = useState(1);
 
   const [isAccordionOpen, setIsAccordionOpen] = useState(true);
 
-
   const [showModalPergunta, setShowModalPergunta] = useState(false);
   const handleCloseModalPergunta = () => setShowModalPergunta(false);
-
-
 
   const [showModalMelhorResposta, setShowModalMelhorResposta] = useState(false);
   const [selectedObject, setSelectedObject] = useState(null);
@@ -43,7 +39,6 @@ function Home() {
     setSelectedObject(null);
     setShowModalMelhorResposta(false);
   };
-
 
   const postData = async (data) => {
     try {
@@ -62,29 +57,28 @@ function Home() {
       console.error("Error:", error);
     }
   };
- // Utiliza a A.I (ChatGPT) para verificar qual a melhor resposta disponível com base no perfil do utilizador
-const checkBestAnswer = (question, answers, userProfile) => {
-  const prompt = `Pregunta ${question}\nRespuestas:\n${answers.map((answer, index) => `${index + 1}. ${answer}`).join('\n')}\nUser Profile: ${JSON.stringify(userProfile)}\n 
+  // Utiliza a A.I (ChatGPT) para verificar qual a melhor resposta disponível com base no perfil do utilizador
+  const checkBestAnswer = (question, answers, userProfile) => {
+    const prompt = `Pregunta ${question}\nRespuestas:\n${answers.map((answer, index) => `${index + 1}. ${answer}`).join("\n")}\nUser Profile: ${JSON.stringify(userProfile)}\n 
   Comprobar las respuestas enumeradas dadas y, basándose en los datos del perfil del usuario y prediciendo cuáles serían sus preferencias para una mejor respuesta, hacer una clasificación diciendo numéricamente de la mejor a la peor respuesta basándose en lo que parece más apropiado para el usuario. La respuesta SOLO debe ser un JSON:. La clasificación sólo debe contener el número de respuestas Ejemplo:{"ranking" : []}`;
 
+    console.log(prompt);
+    postData(prompt);
 
-   console.log(prompt);
-   postData(prompt)
-   
-  // Call the GPT API with the prompt string
-  // ...
-}
+    // Call the GPT API with the prompt string
+    // ...
+  };
 
+  const question = "¿Cómo funciona una transmisión manual?";
+  const answerChoices = [
+    "Una transmisión manual es un componente del vehículo que permite al conductor seleccionar manualmente las marchas del motor. Consiste en un conjunto de engranajes que conectan el motor a las ruedas. El conductor utiliza un pedal de embrague para desconectar temporalmente el motor de la transmisión, permitiendo así cambiar de marcha. Las marchas más bajas proporcionan más potencia para arrancar y subir colinas, mientras que las marchas más altas permiten una mayor velocidad en terrenos planos.",
+    "Una transmisión manual es como una caja de juguetes con diferentes engranajes. El motor del auto está conectado a estos engranajes, y el conductor puede elegir diferentes combinaciones para hacer que el auto vaya más rápido o más lento. Es como cambiar la velocidad de tu bicicleta, ¡pero para un carro!",
+  ];
+  const user = { name: "John", age: 10, levelOfEducation: "Primary", field: "History" };
 
+  checkBestAnswer(question, answerChoices, user);
 
-const question = "¿Cómo funciona una transmisión manual?";
-const answerChoices = ["Una transmisión manual es un componente del vehículo que permite al conductor seleccionar manualmente las marchas del motor. Consiste en un conjunto de engranajes que conectan el motor a las ruedas. El conductor utiliza un pedal de embrague para desconectar temporalmente el motor de la transmisión, permitiendo así cambiar de marcha. Las marchas más bajas proporcionan más potencia para arrancar y subir colinas, mientras que las marchas más altas permiten una mayor velocidad en terrenos planos.", "Una transmisión manual es como una caja de juguetes con diferentes engranajes. El motor del auto está conectado a estos engranajes, y el conductor puede elegir diferentes combinaciones para hacer que el auto vaya más rápido o más lento. Es como cambiar la velocidad de tu bicicleta, ¡pero para un carro!",];
-const user = { name: "John", age: 10, levelOfEducation: "Primary", field : "History"  };
-
-checkBestAnswer(question, answerChoices, user);
-
-  const handleShowModalPergunta = () => 
-  {
+  const handleShowModalPergunta = () => {
     setShowModalPergunta(true);
   };
 
@@ -104,11 +98,11 @@ checkBestAnswer(question, answerChoices, user);
   if (minhasPerguntas) {
     var minhasPerguntasArray = Object.values(minhasPerguntas);
   }
- 
+
   useEffect(() => {
     console.log("P2P component mounted");
     const newPeer = new Peer({
-      host: '192.168.241.159',
+      host: "192.168.241.159",
       port: 9000,
       path: "/myapp",
     });
@@ -141,22 +135,22 @@ checkBestAnswer(question, answerChoices, user);
   }, []);
 
   // Função para comparar duas frases
-function compararFrases(frase1, frase2) {
-  // Calcula a similaridade entre as frases
-  const resultado = stringSimilarity.compareTwoStrings(frase1, frase2);
+  function compararFrases(frase1, frase2) {
+    // Calcula a similaridade entre as frases
+    const resultado = stringSimilarity.compareTwoStrings(frase1, frase2);
 
-  // Define um limite de similaridade (ajuste conforme necessário)
-  const limiteSimilaridade = 0.7;
+    // Define um limite de similaridade (ajuste conforme necessário)
+    const limiteSimilaridade = 0.7;
 
-  // Verifica se a similaridade está acima do limite
-  const saoSemelhantes = resultado >= limiteSimilaridade;
+    // Verifica se a similaridade está acima do limite
+    const saoSemelhantes = resultado >= limiteSimilaridade;
 
-  return {
-    similaridade: resultado,
-    saoSemelhantes,
-  };
-}
-/*
+    return {
+      similaridade: resultado,
+      saoSemelhantes,
+    };
+  }
+  /*
 // Exemplo de uso
 const frase1 = "Qual a maior cidade de Portugal?";
 const frase2 = "Qual a maior cidade do Brasil?";
@@ -193,34 +187,26 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
   const handleReceiveMessage = (message) => {
     const id_remetente = message.id_remetente;
     const type = message.type;
-    const conteudo = message.message
-    if(type === "DIRECT")
-    {
-
-
-    }else if(type === "BROADCAST")
-    {
+    const conteudo = message.message;
+    if (type === "DIRECT") {
+    } else if (type === "BROADCAST") {
       const broadcastType = conteudo.type;
       const personName = conteudo.personName;
 
       // Remover
       //sendDirectMessage(id_remetente, "Olá " + personName + " recebi a sua mensagem");
-      console.log("Resposta enviada?")
-      
-      
-      if(broadcastType === "QUESTION")
-       {
+      console.log("Resposta enviada?");
+
+      if (broadcastType === "QUESTION") {
         console.log("Recebi uma pergunta");
         const question = conteudo.question;
         // Se for para verificar se temos uma pergunta
-      // Comparar o título de cada uma e verificar com "compararFrases()" se são semelhantes
-      // Define a function to compare a question with a list of answers
+        // Comparar o título de cada uma e verificar com "compararFrases()" se são semelhantes
+        // Define a function to compare a question with a list of answers
 
         // Create an empty array to store the matching answers
-       const matchingAnswers = {"id_remetente" : id_remetente, "id_destinatario" : myID, "type" : "DIRECT", "message" : {"type" : "ANSWER", "answer" : [] }};
+        const matchingAnswers = { id_remetente: id_remetente, id_destinatario: myID, type: "DIRECT", message: { type: "ANSWER", answer: [] } };
         const answers = minhasPerguntas;
-
-        
 
         // Loop through each answer in the list
         answers.forEach((answer) => {
@@ -230,11 +216,9 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
 
           // If the similarity is above a certain threshold, add the answer to the matchingAnswers array
           if (similarity.saoSemelhantes) {
-
             matchingAnswers.push(answer);
 
             //enviar as respostas para o utilizador se tiver
-
           }
         });
 
@@ -249,10 +233,10 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
 
         localStorage.setItem("outrasPerguntas", updatedDataJSON);
 
-      //console.log("Respostas semelhantes", matchingAnswers); 
+        //console.log("Respostas semelhantes", matchingAnswers);
 
-      // Se forem semelhantes enviamos a resposta para quem fez o broadcast
-      /*
+        // Se forem semelhantes enviamos a resposta para quem fez o broadcast
+        /*
       const resposta = {
         "respostas" : {
         "1" : { "conteudo" : "xpto", "autor" : "o pai"},
@@ -261,19 +245,13 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
     }
    matchingAnswers.push(resposta)
    */
-        
-      if(matchingAnswers.message.answer > 0)
-      sendDirectMessage(id_remetente, matchingAnswers);
 
-      const questionsReceived = matchingAnswers.message.answer;
+        if (matchingAnswers.message.answer > 0) sendDirectMessage(id_remetente, matchingAnswers);
 
-      questionsReceived.forEach((question) => { 
-        
-     
-       });
-      }
-       else if(broadcastType === "GETQUESTIONS")
-       {
+        const questionsReceived = matchingAnswers.message.answer;
+
+        questionsReceived.forEach((question) => {});
+      } else if (broadcastType === "GETQUESTIONS") {
         // Um pedido para enviarmos todas perguntas que temos, enviamos tudo.
       }
     }
@@ -281,30 +259,29 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
 
   const sendQuestion = (questionText) => {
     const usuarioString = localStorage.getItem("Utilizador");
-    const usuario = usuarioString ? JSON.parse(usuarioString): [];
+    const usuario = usuarioString ? JSON.parse(usuarioString) : [];
     // Converte a string JSON para objeto JavaScript
-    
+
     const uuid = uuidv4();
     console.log("Enviando a pergunta para todoas");
     const nome = usuario.nome;
     const area = usuario.area;
     console.log(usuario);
 
-   // Certifique-se de que o objeto guardarQuestao tenha todas as propriedades necessárias
-const guardarQuestao = {
-  id: uuid,
-  autor: usuario.nome,
-  titulo: questionText,
-  area: usuario.area
-};
-// Resto do código para adicionar ao localStorage
-var JSONperguntaExistente = localStorage.getItem("minhasPerguntas");
-var perguntasExistente = JSONperguntaExistente ? JSON.parse(JSONperguntaExistente) : [];
-perguntasExistente.push(guardarQuestao);
-var novoJSONpergunta = JSON.stringify(perguntasExistente);
-localStorage.setItem("minhasPerguntas", novoJSONpergunta);
+    // Certifique-se de que o objeto guardarQuestao tenha todas as propriedades necessárias
+    const guardarQuestao = {
+      id: uuid,
+      autor: usuario.nome,
+      titulo: questionText,
+      area: usuario.area,
+    };
+    // Resto do código para adicionar ao localStorage
+    var JSONperguntaExistente = localStorage.getItem("minhasPerguntas");
+    var perguntasExistente = JSONperguntaExistente ? JSON.parse(JSONperguntaExistente) : [];
+    perguntasExistente.push(guardarQuestao);
+    var novoJSONpergunta = JSON.stringify(perguntasExistente);
+    localStorage.setItem("minhasPerguntas", novoJSONpergunta);
 
-    
     if (nome) {
       const question = {
         id: uuid,
@@ -351,17 +328,12 @@ localStorage.setItem("minhasPerguntas", novoJSONpergunta);
     });
   };
 
-
-
   const outasPerguntasLocal = localStorage.getItem("outrasPerguntas");
   var outrasPerguntas = JSON.parse(outasPerguntasLocal);
   if (outrasPerguntas) {
     var outrasPerguntasArray = Object.values(outrasPerguntas);
   }
 
-
-
-  
   /*
   const data = {
     model: "gpt-3.5-turbo",
@@ -373,7 +345,6 @@ localStorage.setItem("minhasPerguntas", novoJSONpergunta);
     ],
   };
 */
-
 
   return (
     <>
@@ -402,129 +373,63 @@ localStorage.setItem("minhasPerguntas", novoJSONpergunta);
         <div className="row">
           <div className="col-md-12">
             {activeTab === 1 ? (
-            <>
-            <div className="accordion mt-3" id="usersAccordion">
-              <div className="accordion-item">
-                <h2 className="accordion-header" id="usersHeading">
-                  <button
-                    className={`accordion-button ${!isAccordionOpen ? 'bg-white' : ''}`} // Adicione a classe condicional aqui
-                    type="button"
-                    aria-expanded={isAccordionOpen}
-                    onClick={() => setIsAccordionOpen(!isAccordionOpen)}
-                    aria-controls="collapseOne"
-                  >
-                    Mis Preguntas:
-                  </button>
-                </h2>
-                <div
-                  id="usersCollapse"
-                  className={`accordion-collapse collapse ${isAccordionOpen ? 'show' : ''}`}
-                  aria-labelledby="usersHeading"
-                  data-bs-parent="#usersAccordion"
-                >
-                  <div className="accordion-body" style={{ maxHeight: "1000px", overflowY: "auto" }}>
-                    <ul className="list-group">
-                    { minhasPerguntasArray ? (
-                          minhasPerguntasArray.map((perguntas, index) => (
-                            <div className="card mt-3" key={index}>
-                              <div className="card-header">{perguntas.autor} | {perguntas.area}</div>
-                              <div className="card-body">
-                                <p className="card-text">{perguntas.titulo}</p>
-                                <div className="d-md-flex justify-content-md-end">
-                                  <a className="btn btn-primary" onClick={() => handleShowModal(perguntas)}>
-                                    Más información
-                                  </a>
+              <>  
+                          {minhasPerguntasArray ? (
+                            minhasPerguntasArray.map((perguntas, index) => (
+                              <div className="card mt-3" key={index} onClick={() => handleShowModal(perguntas)}>
+                                <div className="card-header">
+                                  {perguntas.autor} | {perguntas.area}
                                 </div>
-                                {selectedObject ? (
+                                <div className="card-body">
+                                  <p className="card-text">{perguntas.titulo}</p>
+                                  <div className="d-md-flex justify-content-center">TEXTO DA MELHOR PERGUNTA</div>
+                                </div>
+                              </div>
+                            ))
+                          ) : (
+                            <p>No hay preguntas hechas por usted.</p>
+                          )}
+                  {selectedObject ? (
                                   <ModalMelhorResposta show={showModalMelhorResposta} onHide={handleCloseModalMelhorResposta} objeto={selectedObject}/>
                                 ) : (null)}
-                              </div>
-                            </div>
-                          ))
-                        ) : (
-                          <p>No hay datos disponibles.</p>
-                        )}
-                    </ul>
+                  <div class="fab">
+                    <button class="main" onClick={handleShowModalPergunta}>
+                      <Icon.PlusLg />
+                    </button>
+                    <ModalPergunta show={showModalPergunta} onHide={handleCloseModalPergunta} click={handleCloseModalPergunta} sendQuestion={sendQuestion} />
                   </div>
-                </div>
-              </div>
-              <div class="fab">
-                <button class="main" onClick={handleShowModalPergunta}>
-                  <Icon.PlusLg />
-                </button>
-                <ModalPergunta show={showModalPergunta} onHide={handleCloseModalPergunta} click={handleCloseModalPergunta} sendQuestion={sendQuestion} />
-              </div>
-            </div>
-          </>
-          
+              </>
             ) : activeTab === 2 ? (
               <>
-                 <div className="accordion mt-3" id="usersAccordion">
-              <div className="accordion-item">
-                <h2 className="accordion-header" id="usersHeading">
-                  <button
-                    className={`accordion-button ${!isAccordionOpen ? 'bg-white' : ''}`} // Adicione a classe condicional aqui
-                    type="button"
-                    aria-expanded={isAccordionOpen}
-                    onClick={() => setIsAccordionOpen(!isAccordionOpen)}
-                    aria-controls="collapseOne"
-                  >
-                    Outras Preguntas:
-                  </button>
-                </h2>
-                <div
-                  id="usersCollapse"
-                  className={`accordion-collapse collapse ${isAccordionOpen ? 'show' : ''}`}
-                  aria-labelledby="usersHeading"
-                  data-bs-parent="#usersAccordion"
-                >
-                  <div className="accordion-body" style={{ maxHeight: "1000px", overflowY: "auto" }}>
-                    <ul className="list-group">
-                    { outrasPerguntasArray ? (
-                          outrasPerguntasArray.map((perguntas, index) => (
-                            <div className="card mt-3" key={index}>
-                              <div className="card-header">{perguntas.nome}</div>
-                              <div className="card-body">
-                                <p className="card-text">{perguntas.question}</p>
-                                <div className="d-md-flex justify-content-md-end">
-                                  <a className="btn btn-primary" onClick={() => handleShowModal(perguntas)}>
-                                    Responder
-                                  </a>
+                          {outrasPerguntasArray ? (
+                            outrasPerguntasArray.map((perguntas, index) => (
+                              <div className="card mt-3" key={index}>
+                                <div className="card-header">{perguntas.nome}</div>
+                                <div className="card-body">
+                                  <p className="card-text">{perguntas.question}</p>
+                                  <div className="d-md-flex justify-content-md-end">
+                                    <a className="btn btn-primary" onClick={() => handleShowModal(perguntas)}>
+                                      Responder
+                                    </a>
+                                  </div>
+                                  {selectedObject ? <>teste</> : null}
                                 </div>
-                                {selectedObject ? (
-                                  <>teste</>
-                                ) : (null)}
                               </div>
-                            </div>
-                          ))
-                        ) : (
-                          <p>No hay datos disponibles.</p>
-                        )}
-                    </ul>
+                            ))
+                          ) : (
+                            <p>No hay datos de otras preguntas disponibles.</p>
+                          )}
+                  <div class="fab">
+                    <button class="main" onClick={handleShowModalPergunta}>
+                      <Icon.PlusLg />
+                    </button>
+                    <ModalPergunta show={showModalPergunta} onHide={handleCloseModalPergunta} click={handleCloseModalPergunta} sendQuestion={sendQuestion} />
                   </div>
-                </div>
-              </div>
-              <div class="fab">
-                <button class="main" onClick={handleShowModalPergunta}>
-                  <Icon.PlusLg />
-                </button>
-                <ModalPergunta show={showModalPergunta} onHide={handleCloseModalPergunta} click={handleCloseModalPergunta} sendQuestion={sendQuestion} />
-              </div>
-            </div>
+                
               </>
-            ) 
-             : null}
+            ) : null}
           </div>
-
-
-          {!localStorage.getItem("Utilizador") ? (
-            <ModalLogin
-              show={showModalLogin}
-              onHide={handleCloseModalLogin}
-              click={handleCloseModalLogin}
-            />
-          ) : null}
-
+          {!localStorage.getItem("Utilizador") ? <ModalLogin show={showModalLogin} onHide={handleCloseModalLogin} click={handleCloseModalLogin} /> : null}
         </div>
       </div>
     </>
