@@ -74,11 +74,9 @@ function Home() {
  // Utiliza a A.I (ChatGPT) para verificar qual a melhor resposta disponível com base no perfil do utilizador
 const checkBestAnswer = (question, answers, userProfile) => {
   const prompt = `Pregunta ${question}\nRespuestas:\n${answers.map((answer, index) => `${index + 1}. ${answer}`).join('\n')}\nUser Profile: ${JSON.stringify(userProfile)}\n Comprobar las respuestas enumeradas dadas y, basándose en los datos del perfil del usuario y prediciendo cuáles serían sus preferencias para una mejor respuesta, hacer una clasificación diciendo numéricamente de la mejor a la peor respuesta basándose en lo que parece más apropiado para el usuario. La respuesta SOLO debe ser un JSON:. La clasificación sólo debe contener el número de respuestas Ejemplo:{"ranking" : []}`;
-
     console.log(prompt);
     postData(prompt);
-
-
+    return prompt;
 }
 
 
@@ -116,7 +114,9 @@ const checkBestAnswer = (question, answers, userProfile) => {
   useEffect(() => {
     console.log("P2P component mounted");
     const newPeer = new Peer({
-      host: "192.168.243.173",
+
+      host: "localhost",
+
       port: 9000,
       path: "/myapp",
     });
@@ -164,16 +164,7 @@ const checkBestAnswer = (question, answers, userProfile) => {
       saoSemelhantes,
     };
   }
-  /*
-// Exemplo de uso
-const frase1 = "Qual a maior cidade de Portugal?";
-const frase2 = "Qual a maior cidade do Brasil?";
 
-const resultado = compararFrases(frase1, frase2);
-
-console.log(`Similaridade: ${resultado.similaridade}`);
-console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
-*/
   const sendDirectMessage = (id_destinatario, mensagem) => {
     const conn = peerRef.current.connect(id_destinatario);
 
@@ -213,15 +204,22 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
         console.log("Recebi uma resposta");
         const question = conteudo.question;
        // const id_question = question.id; 
-       /*
+       
         const answers = question.answers;
 
         // reeordenar as respostas por ordem de melhor resposta
       const utilizador = localStorage.getItem('Utilizador');
+      if(utilizador && question && answers)
+      {
+            const rankingAnswerJSON =  checkBestAnswer(question, answers, utilizador);
+      const rankingAnswer = rankingAnswerJSON ? JSON.parse(rankingAnswerJSON) : [];
+      console.log("Ranking", rankingAnswer);
+      
+      }
       const rankingAnswerJSON =  checkBestAnswer(question, answers, utilizador);
       const rankingAnswer = rankingAnswerJSON ? JSON.parse(rankingAnswerJSON) : [];
       console.log("Ranking", rankingAnswer);
-      */
+      
       }
 
     }else if(type === "BROADCAST")
@@ -407,12 +405,12 @@ questionsReceived.forEach((question) => {
             <Nav className="me-auto">
               <Nav.Link className="text-light">
                 <a className={`nav-link ${activeTab === 1 ? "active" : ""}`} onClick={() => setActiveTab(1)}>
-                  Preguntas
+                 Mis Preguntas
                 </a>
               </Nav.Link>
               <Nav.Link className="text-light">
                 <a className={`nav-link ${activeTab === 2 ? "active" : ""}`} onClick={() => setActiveTab(2)}>
-                  Respuestas
+                 Otras Preguntas
                 </a>
               </Nav.Link>
             </Nav>
