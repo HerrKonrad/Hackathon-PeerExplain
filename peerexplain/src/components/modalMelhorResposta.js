@@ -7,7 +7,7 @@ const ModalMelhorResposta = ({ show, onHide, objeto }) => {
   return (
     <Modal show={show} onHide={onHide} size="lg">
       <Modal.Header closeButton>
-        <Modal.Title>Melhor resposta para a minha pergunta</Modal.Title>
+        <Modal.Title>Mejor respuesta para mi pregunta</Modal.Title>
       </Modal.Header>
       <Modal.Body>
         {objeto.answers ? (
@@ -54,7 +54,7 @@ const ModalMelhorResposta = ({ show, onHide, objeto }) => {
             ))}
           </>
         ) : (
-          <div>Ainda não tem nenhuma resposta.</div>
+          <div>Todavía no existe ninguna respuesta</div>
         )}
       </Modal.Body>
       <Modal.Footer>

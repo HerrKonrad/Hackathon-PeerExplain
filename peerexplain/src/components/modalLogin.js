@@ -42,7 +42,7 @@ const ModalLogin = ({ show, onHide, click }) => {
               className="mb-3"
               controlId="exampleForm.ControlTextarea1"
             >
-              <Form.Label>Nome</Form.Label>
+              <Form.Label>Nombre</Form.Label>
               <Form.Control
                 type="text"
                 name="nome"
@@ -50,7 +50,7 @@ const ModalLogin = ({ show, onHide, click }) => {
                 ref={nome}
                 required
               />
-              <Form.Label>Data de nascimento</Form.Label>
+              <Form.Label>Fecha de nacimiento</Form.Label>
               <Form.Control
                 type="date"
                 name="dataNasc"
@@ -58,8 +58,8 @@ const ModalLogin = ({ show, onHide, click }) => {
                 ref={dataNasc}
                 required
               />
-              <Form.Select aria-label="Área de Estudo" ref={area} required>
-                <option>Área de Estudo</option>
+              <Form.Select className="mb-3" aria-label="Área de Estudo" ref={area} required>
+                <option>Área de Estudio</option>
                 <option value="Biología">Biología</option>
                 <option value="Química">Química</option>
                 <option value="Física">Física</option>
