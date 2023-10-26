@@ -77,7 +77,7 @@ const ModalRespostas = ({ show, onHide, objeto }) => {
               </div>
             ))
           ) : (
-            <p>Não tem resposta ainda!</p>
+            <p>No existe ninguna respuesta!</p>
           )}
         </div>
         <div className="mt-2 d-flex flex-row align-items-center p-3 form-color">
@@ -90,7 +90,7 @@ const ModalRespostas = ({ show, onHide, objeto }) => {
               onChange={handleInput}
               onKeyDown={handleKeyDown}
             />
-            <button id="send" className="btn" onClick={handleNovaResposta}><Icon.SendFill/></button>
+            <button id="send" className="btn text-light" onClick={handleNovaResposta}><Icon.SendFill/></button>
           </div>
         </div>
       </div>

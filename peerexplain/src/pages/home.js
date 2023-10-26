@@ -10,6 +10,7 @@ import ModalPergunta from "../components/modalPergunta";
 import { Peer } from "peerjs";
 import axios from "axios";
 import ModalRespostas from "../components/modalRespostas";
+import logo from "../logo.png"
 
 import "./style.css";
 import ModalMelhorResposta from "../components/modalMelhorResposta";
@@ -110,7 +111,7 @@ const checkBestAnswer = async (question, answers, userProfile) => {
     console.log("P2P component mounted");
     const newPeer = new Peer({
 
-      host: "192.168.243.173",
+      host: "localhost",
 
       port: 9000,
       path: "/myapp",
@@ -440,22 +441,21 @@ questionsReceived.forEach((question) => {
   if (outrasPerguntas) {
     var outrasPerguntasArray = Object.values(outrasPerguntas);
   }
-  var conteudo = "";
   return (
     <>
-      <Navbar expand="lg" className="bg-primary">
+      <Navbar expand="lg" className="bg-principal">
         <Container>
-          <Navbar.Brand className="text-light">PeerExplain</Navbar.Brand>
+          <Navbar.Brand className="text-light"><img src={logo} className="logo" alt='logo'/></Navbar.Brand>
           <Navbar.Toggle aria-controls="basic-navbar-nav" />
           <Navbar.Collapse id="basic-navbar-nav">
             <Nav className="me-auto">
               <Nav.Link className="text-light">
-                <a className={`nav-link ${activeTab === 1 ? "active" : ""}`} onClick={() => setActiveTab(1)}>
+                <a className={`nav-link text-light${activeTab === 1 ? "active" : ""}`} onClick={() => setActiveTab(1)}>
                  Mis Preguntas
                 </a>
               </Nav.Link>
               <Nav.Link className="text-light">
-                <a className={`nav-link ${activeTab === 2 ? "active" : ""}`} onClick={() => setActiveTab(2)}>
+                <a className={`nav-link text-light ${activeTab === 2 ? "active" : ""}`} onClick={() => setActiveTab(2)}>
                  Otras Preguntas
                 </a>
               </Nav.Link>
@@ -472,7 +472,7 @@ questionsReceived.forEach((question) => {
                 {minhasPerguntasArray && minhasPerguntasArray.length > 0 ? (
                     minhasPerguntasArray.map((perguntas, index) => (
                       <div className="card mt-3" key={index} onClick={() => handleShowModal(perguntas)}>
-                        <div className="card-header">
+                        <div className="card-header bg-grey">
                           {perguntas.autor} | {perguntas.area}
                         </div>
                         <div className="card-body">
@@ -481,7 +481,7 @@ questionsReceived.forEach((question) => {
                           {perguntas.answers && perguntas.answers.length > 0 ? (
                               <p>{perguntas.answers[0]}</p>
                             ) : (
-                              <p>Sem respostas ainda.</p>
+                              <p>No existen respuestas todavía.</p>
                             )}
                           </div>
                         </div>
@@ -507,12 +507,12 @@ questionsReceived.forEach((question) => {
                   outrasPerguntasArray.map((perguntas, index) => (
                     
                     <div className="card mt-3" key={index}>
-                      <div className="card-header">{perguntas.nome}</div>
+                      <div className="card-header bg-grey">{perguntas.nome}</div>
                       <div className="card-body">
                         <p className="card-text">{perguntas.question}</p>
                         <div className="d-md-flex justify-content-md-end">
                           <a className="btn btn-primary" onClick={() => handleShowModalRespostas(perguntas)}>
-                            Responder
+                            Responder <Icon.ReplyFill/>
                           </a>
                         </div>
                       </div>
