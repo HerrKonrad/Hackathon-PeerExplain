@@ -206,7 +206,8 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
       {
         console.log("Recebi uma resposta");
         const question = conteudo.question;
-        const id_question = question.id; 
+       // const id_question = question.id; 
+       /*
         const answers = question.answers;
 
         // reeordenar as respostas por ordem de melhor resposta
@@ -214,6 +215,7 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
       const rankingAnswerJSON =  checkBestAnswer(question, answers, utilizador);
       const rankingAnswer = rankingAnswerJSON ? JSON.parse(rankingAnswerJSON) : [];
       console.log("Ranking", rankingAnswer);
+      */
       }
 
     }else if(type === "BROADCAST")
@@ -234,61 +236,73 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
       // Define a function to compare a question with a list of answers
 
         // Create an empty array to store the matching answers
-       const matchingAnswers = {"id_remetente" : id_remetente, "id_destinatario" : myID, "type" : "DIRECT", "message" : {"type" : "ANSWER", "answer" : [] }};
-        const answers = minhasPerguntas;
-
+       const matchingAnswers = {"id_remetente" : id_remetente, "id_destinatario" : myID, "type" : "DIRECT", "message" : {"type" : "ANSWER", "answers" : [] }};
+      
+       const questions = minhasPerguntas;
+       // console.log(questions)
         
+        if(questions)
+        {
+// Loop through each answer in the list
+questions.forEach((q) => {
+  // Compare the question with the answer's title using the compararFrases function
+  const similarity = compararFrases(question, q.titulo);
+  //console.log("Titulo", answer.titulo)
 
-        // Loop through each answer in the list
-        answers.forEach((answer) => {
-          // Compare the question with the answer's title using the compararFrases function
-          const similarity = compararFrases(question, answer.titulo);
-          //console.log("Titulo", answer.titulo)
+  // If the similarity is above a certain threshold, add the answer to the matchingAnswers array
+  if (similarity.saoSemelhantes) {
 
-          // If the similarity is above a certain threshold, add the answer to the matchingAnswers array
-          if (similarity.saoSemelhantes) {
+    matchingAnswers.message.answers.push(q);
 
-            matchingAnswers.message.answer.push(answer);
+    //enviar as respostas para o utilizador se tiver
 
-            //enviar as respostas para o utilizador se tiver
+  }
+});
 
-          }
-        });
 
-        console.log(conteudo);
 
-        const existingDataJSON = localStorage.getItem("outrasPerguntas");
-        const existingData = existingDataJSON ? JSON.parse(existingDataJSON) : [];
+const existingDataJSON = localStorage.getItem("outrasPerguntas");
+const existingData = existingDataJSON ? JSON.parse(existingDataJSON) : [];
 
-        existingData.push(conteudo);
+existingData.push(conteudo);
 
-        const updatedDataJSON = JSON.stringify(existingData);
+const updatedDataJSON = JSON.stringify(existingData);
 
-        localStorage.setItem("outrasPerguntas", updatedDataJSON);
-        matchingAnswers.push(matchingAnswers)
+localStorage.setItem("outrasPerguntas", updatedDataJSON);
+//matchingAnswers.push(matchingAnswers)
 
-      //console.log("Respostas semelhantes", matchingAnswers); 
+//console.log("Respostas semelhantes", matchingAnswers); 
 
-      // Se forem semelhantes enviamos a resposta para quem fez o broadcast
-      /*
-      const resposta = {
-        "respostas" : {
-        "1" : { "conteudo" : "xpto", "autor" : "o pai"},
-        "2" : {"conteudo" : "xptooooo", "autor" : "o pai"}
-      }
-    }
-   matchingAnswers.push(resposta)
-   */
+// Se forem semelhantes enviamos a resposta para quem fez o broadcast
+/*
+const resposta = {
+"respostas" : {
+"1" : { "conteudo" : "xpto", "autor" : "o pai"},
+"2" : {"conteudo" : "xptooooo", "autor" : "o pai"}
+}
+}
+matchingAnswers.push(resposta)
+*/
+
+console.log(matchingAnswers.message.answers );
+const conteudo_resposta =
+{
+  "type" : "ANSWER",
+  questions : matchingAnswers.message.answers
+}
+if(matchingAnswers.message.answers.length > 0)
+sendDirectMessage(id_remetente, conteudo_resposta);
+
+//const questionsReceived = matchingAnswers.message.answer;
+
+/*
+questionsReceived.forEach((question) => { 
+
+
+});
+*/
+        }
         
-      if(matchingAnswers.message.answer > 0)
-      sendDirectMessage(id_remetente, matchingAnswers);
-
-      const questionsReceived = matchingAnswers.message.answer;
-
-      questionsReceived.forEach((question) => { 
-        
-     
-       });
       }
        else if(broadcastType === "GETQUESTIONS")
        {
