@@ -419,82 +419,74 @@ questionsReceived.forEach((question) => {
           </Navbar.Collapse>
         </Container>
       </Navbar>
-
+  
       <div className="container mt-6 mb-4">
         <div className="row">
           <div className="col-md-12">
             {activeTab === 1 ? (
-              <>  
-                          {minhasPerguntasArray ? (
-                            minhasPerguntasArray.map((perguntas, index) => (
-                              <div className="card mt-3" key={index} onClick={() => handleShowModal(perguntas)}>
-                                <div className="card-header">
-                                  {perguntas.autor} | {perguntas.area}
-                                </div>
-                                <div className="card-body">
-                                  <p className="card-text">{perguntas.titulo}</p>
-                                  <div className="d-md-flex justify-content-center">TEXTO DA MELHOR PERGUNTA</div>
-                                </div>
-                              </div>
-                            ))
-                          ) : (
-                            <p>No hay preguntas hechas por usted.</p>
-                          )}
-                  {selectedObject ? (
-                                  <ModalMelhorResposta show={showModalMelhorResposta} onHide={handleCloseModalMelhorResposta} objeto={selectedObject}/>
-                                ) : (null)}
-                  <div class="fab">
-                    <button class="main" onClick={handleShowModalPergunta}>
-                      <Icon.PlusLg />
-                    </button>
-                    <ModalPergunta show={showModalPergunta} onHide={handleCloseModalPergunta} click={handleCloseModalPergunta} sendQuestion={sendQuestion} />
-                  </div>
+              <>
+                {minhasPerguntasArray ? (
+                  minhasPerguntasArray.map((perguntas, index) => (
+                    <div className="card mt-3" key={index} onClick={() => handleShowModal(perguntas)}>
+                      <div className="card-header">
+                        {perguntas.autor} | {perguntas.area}
+                      </div>
+                      <div className="card-body">
+                        <p className="card-text">{perguntas.titulo}</p>
+                        <div className="d-md-flex justify-content-center">TEXTO DA MELHOR PERGUNTA</div>
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p>No hay preguntas hechas por usted.</p>
+                )}
+                {selectedObject ? (
+                  <ModalMelhorResposta show={showModalMelhorResposta} onHide={handleCloseModalMelhorResposta} objeto={selectedObject} />
+                ) : null}
+                <div className="fab">
+                  <button className="main" onClick={handleShowModalPergunta}>
+                    <Icon.PlusLg />
+                  </button>
+                  <ModalPergunta show={showModalPergunta} onHide={handleCloseModalPergunta} click={handleCloseModalPergunta} sendQuestion={sendQuestion} />
+                </div>
               </>
             ) : activeTab === 2 ? (
               <>
-                          {outrasPerguntasArray ? (
-                            outrasPerguntasArray.map((perguntas, index) => (
-                              <div className="card mt-3" key={index}>
-                                <div className="card-header">{perguntas.nome}</div>
-                                <div className="card-body">
-                                  <p className="card-text">{perguntas.question}</p>
-                                  <div className="d-md-flex justify-content-md-end">
-                                    <a className="btn btn-primary" onClick={() => handleShowModalRespostas(perguntas)} >
-                                      Responder
-                                    </a>
-                                  </div>
-                                  {selectedObjectRespostas ? ( 
-                                 <ModalRespostas show={showModalRespostas} onHide={handleCloseModalRespostas} click={handleCloseModalRespostas} objeto={selectedObjectRespostas}/>
-                                ): (null)}
-                                </div>
-                              </div>
-                            ))
-                          ) : (
-                            <p>No hay datos de otras preguntas disponibles.</p>
-                          )}
-                  <div class="fab">
-                    <button class="main" onClick={handleShowModalPergunta}>
-                      <Icon.PlusLg />
-                    </button>
-                    <ModalPergunta show={showModalPergunta} onHide={handleCloseModalPergunta} click={handleCloseModalPergunta} sendQuestion={sendQuestion} />
-                  </div>
+                {outrasPerguntasArray ? (
+                  outrasPerguntasArray.map((perguntas, index) => (
+                    <div className="card mt-3" key={index}>
+                      <div className="card-header">{perguntas.nome}</div>
+                      <div className="card-body">
+                        <p className="card-text">{perguntas.question}</p>
+                        <div className="d-md-flex justify-content-md-end">
+                          <a className="btn btn-primary" onClick={() => handleShowModalRespostas(perguntas)}>
+                            Responder
+                          </a>
+                        </div>
+                        {selectedObjectRespostas ? (
+                          <ModalRespostas show={showModalRespostas} onHide={handleCloseModalRespostas} click={handleCloseModalRespostas} objeto={selectedObjectRespostas} />
+                        ) : null}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <p>No hay datos de otras preguntas disponibles.</p>
+                )}
+                <div className="fab">
+                  <button className="main" onClick={handleShowModalPergunta}>
+                    <Icon.PlusLg />
+                  </button>
+                  <ModalPergunta show={showModalPergunta} onHide={handleCloseModalPergunta} click={handleCloseModalPergunta} sendQuestion={sendQuestion} />
                 </div>
-              </div>
-              <div class="fab">
-                <button class="main" onClick={handleShowModalPergunta}>
-                  <Icon.PlusLg />
-                </button>
-              </div>
-            </div>
-
               </>
             ) : null}
           </div>
-          {!localStorage.getItem("Utilizador") ? <ModalLogin show={showModalLogin} onHide={handleCloseModalLogin} click={handleCloseModalLogin} /> : null}
         </div>
       </div>
+      {!localStorage.getItem("Utilizador") ? <ModalLogin show={showModalLogin} onHide={handleCloseModalLogin} click={handleCloseModalLogin} /> : null}
     </>
   );
+  
 }
 
 export default Home;
