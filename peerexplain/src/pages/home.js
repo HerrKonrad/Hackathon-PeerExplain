@@ -9,6 +9,7 @@ import { v4 as uuidv4 } from 'uuid';
 import ModalPergunta from "../components/modalPergunta";
 import { Peer } from 'peerjs';
 import axios from "axios";
+import ModalRespostas from "../components/modalRespostas";
 
 import "./style.css";
 import ModalMelhorResposta from "../components/modalMelhorResposta";
@@ -29,6 +30,10 @@ function Home() {
   const [showModalPergunta, setShowModalPergunta] = useState(false);
   const handleCloseModalPergunta = () => setShowModalPergunta(false);
 
+
+  
+  const [showModalRespostas, setShowModalRespostas] = useState(false);
+  const handleCloseModalRespostas = () => setShowModalRespostas(false);
 
 
   const [showModalMelhorResposta, setShowModalMelhorResposta] = useState(false);
@@ -69,7 +74,7 @@ const checkBestAnswer = (question, answers, userProfile) => {
 
 
    console.log(prompt);
-   postData(prompt)
+   //postData(prompt)
    
   // Call the GPT API with the prompt string
   // ...
@@ -86,6 +91,11 @@ checkBestAnswer(question, answerChoices, user);
   const handleShowModalPergunta = () => 
   {
     setShowModalPergunta(true);
+  };
+
+  const handleShowModalRespostas = () => 
+  {
+    setShowModalRespostas(true);
   };
 
   const [showModalLogin, setShowModalLogin] = useState(true);
@@ -487,13 +497,13 @@ localStorage.setItem("minhasPerguntas", novoJSONpergunta);
                               <div className="card-body">
                                 <p className="card-text">{perguntas.question}</p>
                                 <div className="d-md-flex justify-content-md-end">
-                                  <a className="btn btn-primary" onClick={() => handleShowModal(perguntas)}>
+                                  <a className="btn btn-primary" onClick={handleShowModalRespostas} >
                                     Responder
                                   </a>
                                 </div>
-                                {selectedObject ? (
-                                  <>teste</>
-                                ) : (null)}
+                                
+                                 <ModalRespostas show={showModalRespostas} onHide={handleCloseModalRespostas} click={handleCloseModalRespostas} />
+                                
                               </div>
                             </div>
                           ))
