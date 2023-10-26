@@ -23,7 +23,6 @@ api.defaults.headers.common["Authorization"] = `Bearer ${process.env.REACT_APP_O
 function Home() {
   const [activeTab, setActiveTab] = useState(1);
 
-  const [isAccordionOpen, setIsAccordionOpen] = useState(true);
 
   const [showModalPergunta, setShowModalPergunta] = useState(false);
   const handleCloseModalPergunta = () => setShowModalPergunta(false);  
@@ -83,6 +82,8 @@ const checkBestAnswer = async (question, answers, userProfile) => {
 
 
 
+
+
   const handleShowModalPergunta = () => {
     setShowModalPergunta(true);
   };
@@ -109,7 +110,7 @@ const checkBestAnswer = async (question, answers, userProfile) => {
     console.log("P2P component mounted");
     const newPeer = new Peer({
 
-      host: "localhost",
+      host: "192.168.243.173",
 
       port: 9000,
       path: "/myapp",
@@ -189,6 +190,7 @@ const checkBestAnswer = async (question, answers, userProfile) => {
 
     const conteudo = message.message
     const personName = conteudo.personName;
+    const id_question = message.message.id
     if(type === "DIRECT")
     {
       const directType = conteudo.type;
@@ -196,7 +198,9 @@ const checkBestAnswer = async (question, answers, userProfile) => {
       if(directType === "ANSWER")
       {
         console.log("Recebi uma resposta");
+
         const question = message.message.questions;
+
         const answers = question.answers;
         const questionId = message.message.id_original_question;
         
@@ -278,7 +282,7 @@ const checkBestAnswer = async (question, answers, userProfile) => {
 
         // Create an empty array to store the matching answers
 
-       const matchingAnswers = {"id_remetente" : id_remetente, "id_destinatario" : myID, "type" : "DIRECT", "message" : {"type" : "ANSWER", "answers" : [] }};
+        const matchingAnswers = {"id_remetente" : id_remetente, "id_destinatario" : myID,  "type" : "DIRECT", "message" : {"type" : "ANSWER", "answers" : [] }};
       
        const questions = minhasPerguntas;
        // console.log(questions)
@@ -332,6 +336,8 @@ console.log(matchingAnswers.message.answers );
 const conteudo_resposta =
 {
   "type" : "ANSWER",
+
+
   questions : matchingAnswers.message.answers[0]
 }
 if(matchingAnswers.message.answers.length > 0)
@@ -372,7 +378,9 @@ questionsReceived.forEach((question) => {
       autor: usuario.nome,
       question: questionText,
       area: usuario.area,
+
       answers: []
+
     };
     // Resto do código para adicionar ao localStorage
     var JSONperguntaExistente = localStorage.getItem("minhasPerguntas");
@@ -432,8 +440,7 @@ questionsReceived.forEach((question) => {
   if (outrasPerguntas) {
     var outrasPerguntasArray = Object.values(outrasPerguntas);
   }
-
-
+  var conteudo = "";
   return (
     <>
       <Navbar expand="lg" className="bg-primary">
@@ -462,21 +469,28 @@ questionsReceived.forEach((question) => {
           <div className="col-md-12">
             {activeTab === 1 ? (
               <>
-                {minhasPerguntasArray ? (
-                  minhasPerguntasArray.map((perguntas, index) => (
-                    <div className="card mt-3" key={index} onClick={() => handleShowModal(perguntas)}>
-                      <div className="card-header">
-                        {perguntas.autor} | {perguntas.area}
+                {minhasPerguntasArray && minhasPerguntasArray.length > 0 ? (
+                    minhasPerguntasArray.map((perguntas, index) => (
+                      <div className="card mt-3" key={index} onClick={() => handleShowModal(perguntas)}>
+                        <div className="card-header">
+                          {perguntas.autor} | {perguntas.area}
+                        </div>
+                        <div className="card-body">
+                        <p className="card-text" style={{ fontWeight: 'bold' }}>{perguntas.question}</p>
+                          <div className="d-md-flex justify-content-center">
+                          {perguntas.answers && perguntas.answers.length > 0 ? (
+                              <p>{perguntas.answers[0]}</p>
+                            ) : (
+                              <p>Sem respostas ainda.</p>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <div className="card-body">
-                        <p className="card-text">{perguntas.question}</p>
-                        <div className="d-md-flex justify-content-center">TEXTO DA MELHOR PERGUNTA</div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p>No hay preguntas hechas por usted.</p>
-                )}
+                    ))
+                  ) : (
+                    <p>No hay preguntas hechas por usted.</p>
+                  )}
+
                 {selectedObject ? (
                   <ModalMelhorResposta show={showModalMelhorResposta} onHide={handleCloseModalMelhorResposta} objeto={selectedObject} />
                 ) : null}
