@@ -91,7 +91,7 @@ checkBestAnswer(question, answerChoices, user);
   useEffect(() => {
     console.log("P2P component mounted");
     const newPeer = new Peer({
-      host: '192.168.240.223',
+      host: '192.168.241.159',
       port: 9000,
       path: "/myapp",
     });
@@ -200,7 +200,7 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
       // Define a function to compare a question with a list of answers
 
         // Create an empty array to store the matching answers
-       const matchingAnswers = [];
+       const matchingAnswers = {"id_remetente" : id_remetente, "id_destinatario" : myID, "type" : "DIRECT", "message" : {"type" : "ANSWER", "answer" : [] }};
         const answers = minhasPerguntas;
 
         
@@ -213,9 +213,10 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
 
           // If the similarity is above a certain threshold, add the answer to the matchingAnswers array
           if (similarity.saoSemelhantes) {
-            matchingAnswers.push(answer);
+            matchingAnswers.message.answer.push(answer);
           }
         });
+
 
     
       console.log("Respostas semelhantes", matchingAnswers); 
@@ -231,12 +232,16 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
    matchingAnswers.push(resposta)
    */
         
-      if(matchingAnswers.length > 0)
+      if(matchingAnswers.message.answer > 0)
       sendDirectMessage(id_remetente, matchingAnswers);
 
+      const questionsReceived = matchingAnswers.message.answer;
 
-      // Se não forem semelhantes não fazemos nada
-       }
+      questionsReceived.forEach((question) => { 
+        
+     
+       });
+      }
        else if(broadcastType === "GETQUESTIONS")
        {
         // Um pedido para enviarmos todas perguntas que temos, enviamos tudo.
