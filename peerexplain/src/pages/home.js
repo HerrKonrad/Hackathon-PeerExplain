@@ -505,6 +505,7 @@ questionsReceived.forEach((question) => {
               <>
                 {outrasPerguntasArray ? (
                   outrasPerguntasArray.map((perguntas, index) => (
+                    
                     <div className="card mt-3" key={index}>
                       <div className="card-header">{perguntas.nome}</div>
                       <div className="card-body">
@@ -514,11 +515,9 @@ questionsReceived.forEach((question) => {
                             Responder
                           </a>
                         </div>
-                        {selectedObjectRespostas ? (
-                          <ModalRespostas show={showModalRespostas} onHide={handleCloseModalRespostas} click={handleCloseModalRespostas} objeto={selectedObjectRespostas} />
-                        ) : null}
                       </div>
                     </div>
+                  
                   ))
                 ) : (
                   <p>No hay datos de otras preguntas disponibles.</p>
@@ -534,6 +533,10 @@ questionsReceived.forEach((question) => {
           </div>
         </div>
       </div>
+
+      {selectedObjectRespostas ? (
+        <ModalRespostas show={showModalRespostas} onHide={handleCloseModalRespostas} click={handleCloseModalRespostas} objeto={selectedObjectRespostas} />
+      ) : null}
       {!localStorage.getItem("Utilizador") ? <ModalLogin show={showModalLogin} onHide={handleCloseModalLogin} click={handleCloseModalLogin} /> : null}
     </>
   );
