@@ -23,7 +23,6 @@ api.defaults.headers.common["Authorization"] = `Bearer ${process.env.REACT_APP_O
 function Home() {
   const [activeTab, setActiveTab] = useState(1);
 
-  const [isAccordionOpen, setIsAccordionOpen] = useState(true);
 
   const [showModalPergunta, setShowModalPergunta] = useState(false);
   const handleCloseModalPergunta = () => setShowModalPergunta(false);  
@@ -81,12 +80,6 @@ const checkBestAnswer = (question, answers, userProfile) => {
 
 
 
-  const question = "¿Cómo funciona una transmisión manual?";
-  const answerChoices = [
-    "Una transmisión manual es un componente del vehículo que permite al conductor seleccionar manualmente las marchas del motor. Consiste en un conjunto de engranajes que conectan el motor a las ruedas. El conductor utiliza un pedal de embrague para desconectar temporalmente el motor de la transmisión, permitiendo así cambiar de marcha. Las marchas más bajas proporcionan más potencia para arrancar y subir colinas, mientras que las marchas más altas permiten una mayor velocidad en terrenos planos.",
-    "Una transmisión manual es como una caja de juguetes con diferentes engranajes. El motor del auto está conectado a estos engranajes, y el conductor puede elegir diferentes combinaciones para hacer que el auto vaya más rápido o más lento. Es como cambiar la velocidad de tu bicicleta, ¡pero para un carro!",
-  ];
-  const user = { name: "John", age: 10, levelOfEducation: "Primary", field: "History" };
 
 
   const handleShowModalPergunta = () => {
@@ -115,7 +108,7 @@ const checkBestAnswer = (question, answers, userProfile) => {
     console.log("P2P component mounted");
     const newPeer = new Peer({
 
-      host: "localhost",
+      host: "192.168.243.173",
 
       port: 9000,
       path: "/myapp",
@@ -195,6 +188,7 @@ const checkBestAnswer = (question, answers, userProfile) => {
 
     const conteudo = message.message
     const personName = conteudo.personName;
+    const id_question = message.message.id
     if(type === "DIRECT")
     {
       const directType = conteudo.type;
@@ -203,7 +197,7 @@ const checkBestAnswer = (question, answers, userProfile) => {
       {
         console.log("Recebi uma resposta");
         const question = conteudo.question;
-       // const id_question = question.id; 
+        
        
         const answers = question.answers;
 
@@ -240,7 +234,7 @@ const checkBestAnswer = (question, answers, userProfile) => {
 
         // Create an empty array to store the matching answers
 
-       const matchingAnswers = {"id_remetente" : id_remetente, "id_destinatario" : myID, "type" : "DIRECT", "message" : {"type" : "ANSWER", "answers" : [] }};
+        const matchingAnswers = {"id_remetente" : id_remetente, "id_destinatario" : myID,  "type" : "DIRECT", "message" : {"type" : "ANSWER", "answers" : [] }};
       
        const questions = minhasPerguntas;
        // console.log(questions)
@@ -294,7 +288,8 @@ console.log(matchingAnswers.message.answers );
 const conteudo_resposta =
 {
   "type" : "ANSWER",
-  questions : matchingAnswers.message.answers
+  "id_original_question" : id_question,
+  questions : matchingAnswers.message.answers[0]
 }
 if(matchingAnswers.message.answers.length > 0)
 sendDirectMessage(id_remetente, conteudo_resposta);
@@ -334,6 +329,7 @@ questionsReceived.forEach((question) => {
       autor: usuario.nome,
       question: questionText,
       area: usuario.area,
+      answers: [],
     };
     // Resto do código para adicionar ao localStorage
     var JSONperguntaExistente = localStorage.getItem("minhasPerguntas");
@@ -393,8 +389,7 @@ questionsReceived.forEach((question) => {
   if (outrasPerguntas) {
     var outrasPerguntasArray = Object.values(outrasPerguntas);
   }
-
-
+  var conteudo = "";
   return (
     <>
       <Navbar expand="lg" className="bg-primary">
@@ -423,21 +418,28 @@ questionsReceived.forEach((question) => {
           <div className="col-md-12">
             {activeTab === 1 ? (
               <>
-                {minhasPerguntasArray ? (
-                  minhasPerguntasArray.map((perguntas, index) => (
-                    <div className="card mt-3" key={index} onClick={() => handleShowModal(perguntas)}>
-                      <div className="card-header">
-                        {perguntas.autor} | {perguntas.area}
+                {minhasPerguntasArray && minhasPerguntasArray.length > 0 ? (
+                    minhasPerguntasArray.map((perguntas, index) => (
+                      <div className="card mt-3" key={index} onClick={() => handleShowModal(perguntas)}>
+                        <div className="card-header">
+                          {perguntas.autor} | {perguntas.area}
+                        </div>
+                        <div className="card-body">
+                        <p className="card-text" style={{ fontWeight: 'bold' }}>{perguntas.question}</p>
+                          <div className="d-md-flex justify-content-center">
+                          {perguntas.answers && perguntas.answers.length > 0 ? (
+                              <p>{perguntas.answers[0]}</p>
+                            ) : (
+                              <p>Sem respostas ainda.</p>
+                            )}
+                          </div>
+                        </div>
                       </div>
-                      <div className="card-body">
-                        <p className="card-text">{perguntas.question}</p>
-                        <div className="d-md-flex justify-content-center">TEXTO DA MELHOR PERGUNTA</div>
-                      </div>
-                    </div>
-                  ))
-                ) : (
-                  <p>No hay preguntas hechas por usted.</p>
-                )}
+                    ))
+                  ) : (
+                    <p>No hay preguntas hechas por usted.</p>
+                  )}
+
                 {selectedObject ? (
                   <ModalMelhorResposta show={showModalMelhorResposta} onHide={handleCloseModalMelhorResposta} objeto={selectedObject} />
                 ) : null}
