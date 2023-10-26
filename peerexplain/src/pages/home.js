@@ -58,10 +58,13 @@ function Home() {
       };
       const response = await api.post("/chat/completions", toSend);
       console.log("Response data:", response.data.choices[0].message.content);
+      return response.data.choices[0].message.content;
     } catch (error) {
       console.error("Error:", error);
+      return ""
     }
   };
+  
  // Utiliza a A.I (ChatGPT) para verificar qual a melhor resposta disponível com base no perfil do utilizador
 const checkBestAnswer = (question, answers, userProfile) => {
   const prompt = `Pregunta ${question}\nRespuestas:\n${answers.map((answer, index) => `${index + 1}. ${answer}`).join('\n')}\nUser Profile: ${JSON.stringify(userProfile)}\n 
@@ -81,7 +84,7 @@ const question = "¿Cómo funciona una transmisión manual?";
 const answerChoices = ["Una transmisión manual es un componente del vehículo que permite al conductor seleccionar manualmente las marchas del motor. Consiste en un conjunto de engranajes que conectan el motor a las ruedas. El conductor utiliza un pedal de embrague para desconectar temporalmente el motor de la transmisión, permitiendo así cambiar de marcha. Las marchas más bajas proporcionan más potencia para arrancar y subir colinas, mientras que las marchas más altas permiten una mayor velocidad en terrenos planos.", "Una transmisión manual es como una caja de juguetes con diferentes engranajes. El motor del auto está conectado a estos engranajes, y el conductor puede elegir diferentes combinaciones para hacer que el auto vaya más rápido o más lento. Es como cambiar la velocidad de tu bicicleta, ¡pero para un carro!",];
 const user = { name: "John", age: 10, levelOfEducation: "Primary", field : "History"  };
 
-checkBestAnswer(question, answerChoices, user);
+//checkBestAnswer(question, answerChoices, user);
 
   const handleShowModalPergunta = () => 
   {
@@ -194,14 +197,28 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
     const id_remetente = message.id_remetente;
     const type = message.type;
     const conteudo = message.message
+    const personName = conteudo.personName;
     if(type === "DIRECT")
     {
+      const directType = conteudo.type;
 
+      if(directType === "ANSWER")
+      {
+        console.log("Recebi uma resposta");
+        const question = conteudo.question;
+        const id_question = question.id; 
+        const answers = question.answers;
+
+        // reeordenar as respostas por ordem de melhor resposta
+      const utilizador = localStorage.getItem('Utilizador');
+      const rankingAnswerJSON =  checkBestAnswer(question, answers, utilizador);
+      const rankingAnswer = rankingAnswerJSON ? JSON.parse(rankingAnswerJSON) : [];
+      console.log("Ranking", rankingAnswer);
+      }
 
     }else if(type === "BROADCAST")
     {
       const broadcastType = conteudo.type;
-      const personName = conteudo.personName;
 
       // Remover
       //sendDirectMessage(id_remetente, "Olá " + personName + " recebi a sua mensagem");
@@ -231,7 +248,7 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
           // If the similarity is above a certain threshold, add the answer to the matchingAnswers array
           if (similarity.saoSemelhantes) {
 
-            matchingAnswers.push(answer);
+            matchingAnswers.message.answer.push(answer);
 
             //enviar as respostas para o utilizador se tiver
 
@@ -248,6 +265,7 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
         const updatedDataJSON = JSON.stringify(existingData);
 
         localStorage.setItem("outrasPerguntas", updatedDataJSON);
+        matchingAnswers.push(matchingAnswers)
 
       //console.log("Respostas semelhantes", matchingAnswers); 
 
@@ -362,18 +380,6 @@ localStorage.setItem("minhasPerguntas", novoJSONpergunta);
 
 
   
-  /*
-  const data = {
-    model: "gpt-3.5-turbo",
-    messages: [
-      {
-        role: "user",
-        content: "Nome de 3 gatos",
-      },
-    ],
-  };
-*/
-
 
   return (
     <>
