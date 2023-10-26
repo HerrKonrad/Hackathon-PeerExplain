@@ -217,7 +217,7 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
       // Define a function to compare a question with a list of answers
 
         // Create an empty array to store the matching answers
-       const matchingAnswers = [];
+       const matchingAnswers = {"id_remetente" : id_remetente, "id_destinatario" : myID, "type" : "DIRECT", "message" : {"type" : "ANSWER", "answer" : [] }};
         const answers = minhasPerguntas;
 
         
@@ -230,6 +230,7 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
 
           // If the similarity is above a certain threshold, add the answer to the matchingAnswers array
           if (similarity.saoSemelhantes) {
+
             matchingAnswers.push(answer);
 
             //enviar as respostas para o utilizador se tiver
@@ -261,12 +262,16 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
    matchingAnswers.push(resposta)
    */
         
-      if(matchingAnswers.length > 0)
+      if(matchingAnswers.message.answer > 0)
       sendDirectMessage(id_remetente, matchingAnswers);
 
+      const questionsReceived = matchingAnswers.message.answer;
 
-      // Se não forem semelhantes não fazemos nada
-       }
+      questionsReceived.forEach((question) => { 
+        
+     
+       });
+      }
        else if(broadcastType === "GETQUESTIONS")
        {
         // Um pedido para enviarmos todas perguntas que temos, enviamos tudo.
