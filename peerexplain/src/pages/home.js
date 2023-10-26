@@ -37,6 +37,14 @@ function Home() {
     setShowModalMelhorResposta(true);
   };
 
+  const [selectedObjectRespostas, setSelectedObjectRespostas] = useState(null);
+  
+  const handleShowModalRespostas = (objeto) => 
+  {
+    setSelectedObjectRespostas(objeto);
+    setShowModalRespostas(true);
+  };
+
   const handleCloseModalMelhorResposta = () => {
     setSelectedObject(null);
     setShowModalMelhorResposta(false);
@@ -87,10 +95,6 @@ const checkBestAnswer = (question, answers, userProfile) => {
     setShowModalPergunta(true);
   };
 
-  const handleShowModalRespostas = () => 
-  {
-    setShowModalRespostas(true);
-  };
 
   const [showModalLogin, setShowModalLogin] = useState(true);
 
@@ -230,8 +234,9 @@ console.log(`As frases são semelhantes? ${resultado.saoSemelhantes}`);
 
       if (broadcastType === "QUESTION") {
         console.log("Recebi uma pergunta");
-        const question = conteudo.question;
+        const question = conteudo.question; 
         // Se for para verificar se temos uma pergunta
+
         // Comparar o título de cada uma e verificar com "compararFrases()" se são semelhantes
         // Define a function to compare a question with a list of answers
 
@@ -249,6 +254,7 @@ questions.forEach((q) => {
   // Compare the question with the answer's title using the compararFrases function
   const similarity = compararFrases(question, q.titulo);
   //console.log("Titulo", answer.titulo)
+
 
   // If the similarity is above a certain threshold, add the answer to the matchingAnswers array
   if (similarity.saoSemelhantes) {
@@ -453,11 +459,13 @@ questionsReceived.forEach((question) => {
                                 <div className="card-body">
                                   <p className="card-text">{perguntas.question}</p>
                                   <div className="d-md-flex justify-content-md-end">
-                                    <a className="btn btn-primary" onClick={() => handleShowModal(perguntas)}>
+                                    <a className="btn btn-primary" onClick={() => handleShowModalRespostas(perguntas)} >
                                       Responder
                                     </a>
                                   </div>
-                                  {selectedObject ? <>teste</> : null}
+                                  {selectedObjectRespostas ? ( 
+                                 <ModalRespostas show={showModalRespostas} onHide={handleCloseModalRespostas} click={handleCloseModalRespostas} objeto={selectedObjectRespostas}/>
+                                ): (null)}
                                 </div>
                               </div>
                             ))
@@ -470,7 +478,15 @@ questionsReceived.forEach((question) => {
                     </button>
                     <ModalPergunta show={showModalPergunta} onHide={handleCloseModalPergunta} click={handleCloseModalPergunta} sendQuestion={sendQuestion} />
                   </div>
-                
+                </div>
+              </div>
+              <div class="fab">
+                <button class="main" onClick={handleShowModalPergunta}>
+                  <Icon.PlusLg />
+                </button>
+              </div>
+            </div>
+
               </>
             ) : null}
           </div>
